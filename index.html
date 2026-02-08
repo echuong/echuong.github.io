@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioSearch - Scientific Dataset Search</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">
+                    <span class="logo-icon">&#x1F9EC;</span>
+                    BioSearch
+                </h1>
+                <p class="tagline">Search SRA, GEO &amp; dbGaP datasets in one place</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="search-section">
+            <form id="search-form" class="search-form">
+                <div class="search-bar">
+                    <input
+                        type="text"
+                        id="search-input"
+                        class="search-input"
+                        placeholder="Search for datasets (e.g., &quot;CRISPR screen in human cancer cells&quot;)"
+                        autocomplete="off"
+                    >
+                    <button type="submit" class="search-btn" id="search-btn">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="m21 21-4.35-4.35"/>
+                        </svg>
+                        Search
+                    </button>
+                </div>
+
+                <div class="filters">
+                    <div class="filter-group">
+                        <label class="filter-label">Databases</label>
+                        <div class="chip-group" id="db-filters">
+                            <button type="button" class="chip active" data-db="sra">SRA</button>
+                            <button type="button" class="chip active" data-db="gds">GEO</button>
+                            <button type="button" class="chip active" data-db="gap">dbGaP</button>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Assay Type</label>
+                        <div class="chip-group" id="assay-filters">
+                            <button type="button" class="chip" data-assay="">All</button>
+                            <button type="button" class="chip" data-assay="rna seq">RNA-seq</button>
+                            <button type="button" class="chip" data-assay="atac seq">ATAC-seq</button>
+                            <button type="button" class="chip" data-assay="chip seq">ChIP-seq</button>
+                            <button type="button" class="chip" data-assay="wgs">WGS</button>
+                            <button type="button" class="chip" data-assay="wxs">WXS/Exome</button>
+                            <button type="button" class="chip" data-assay="scrna seq">scRNA-seq</button>
+                            <button type="button" class="chip" data-assay="bisulfite seq">Bisulfite-seq</button>
+                            <button type="button" class="chip" data-assay="hi-c">Hi-C</button>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Organism</label>
+                        <div class="chip-group" id="organism-filters">
+                            <button type="button" class="chip" data-organism="">Any</button>
+                            <button type="button" class="chip" data-organism="Homo sapiens">Human</button>
+                            <button type="button" class="chip" data-organism="Mus musculus">Mouse</button>
+                            <button type="button" class="chip" data-organism="Drosophila melanogaster">Fly</button>
+                            <button type="button" class="chip" data-organism="Caenorhabditis elegans">Worm</button>
+                            <button type="button" class="chip" data-organism="Danio rerio">Zebrafish</button>
+                            <button type="button" class="chip" data-organism="Saccharomyces cerevisiae">Yeast</button>
+                            <button type="button" class="chip" data-organism="Arabidopsis thaliana">Arabidopsis</button>
+                        </div>
+                    </div>
+
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label class="filter-label" for="max-results">Results per database</label>
+                            <select id="max-results" class="select-input">
+                                <option value="10">10</option>
+                                <option value="20" selected>20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label" for="sort-order">Sort by</label>
+                            <select id="sort-order" class="select-input">
+                                <option value="relevance">Relevance</option>
+                                <option value="date">Date (newest)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <section id="status-section" class="status-section hidden">
+            <div class="status-bar">
+                <div class="spinner"></div>
+                <span id="status-text">Searching...</span>
+            </div>
+        </section>
+
+        <section id="summary-section" class="summary-section hidden">
+            <div class="summary-bar">
+                <span id="summary-text"></span>
+                <button id="clear-btn" class="clear-btn">Clear results</button>
+            </div>
+        </section>
+
+        <section id="results-section" class="results-section hidden">
+            <div class="results-tabs" id="results-tabs">
+                <button class="tab active" data-tab="all">All</button>
+                <button class="tab" data-tab="sra">SRA <span class="tab-count" id="sra-count">0</span></button>
+                <button class="tab" data-tab="gds">GEO <span class="tab-count" id="gds-count">0</span></button>
+                <button class="tab" data-tab="gap">dbGaP <span class="tab-count" id="gap-count">0</span></button>
+            </div>
+            <div id="results-list" class="results-list"></div>
+        </section>
+
+        <section id="empty-state" class="empty-state">
+            <div class="empty-content">
+                <div class="empty-icon">&#x1F50D;</div>
+                <h2>Search scientific datasets</h2>
+                <p>Search across NCBI's Sequence Read Archive (SRA), Gene Expression Omnibus (GEO), and Database of Genotypes and Phenotypes (dbGaP).</p>
+                <div class="example-searches">
+                    <p class="example-label">Try searching for:</p>
+                    <div class="example-chips">
+                        <button class="example-chip" data-query="breast cancer RNA-seq">breast cancer RNA-seq</button>
+                        <button class="example-chip" data-query="CRISPR screen">CRISPR screen</button>
+                        <button class="example-chip" data-query="single cell atlas">single cell atlas</button>
+                        <button class="example-chip" data-query="COVID-19">COVID-19</button>
+                        <button class="example-chip" data-query="epigenome roadmap">epigenome roadmap</button>
+                        <button class="example-chip" data-query="transposable elements">transposable elements</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>Data sourced from <a href="https://www.ncbi.nlm.nih.gov/" target="_blank" rel="noopener">NCBI</a> via E-utilities API. This tool is not affiliated with NCBI/NIH.</p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
