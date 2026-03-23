@@ -303,7 +303,7 @@
                 const x = (W / (count + 1)) * (i + 1) + (Math.random() - 0.5) * 80;
                 const h = H * (0.4 + Math.random() * 0.3);
                 const y = H * 0.15 + Math.random() * H * 0.2;
-                const w = 30 + Math.random() * 20;
+                const w = 40 + Math.random() * 25;
                 const bands = Math.floor(6 + Math.random() * 8);
                 chromosomes.push({ x, y, w, h, bands });
             }
@@ -327,7 +327,7 @@
             ghosts = [];
             bursts = [];
             const colors = ['#e94560', '#00d4ff', '#16c79a', '#f5f749', '#a855f7'];
-            const count = 55 + Math.floor(Math.random() * 25);
+            const count = 75 + Math.floor(Math.random() * 30);
             for (let i = 0; i < count; i++) {
                 const spot = pickChromoSpot();
                 invaders.push({
@@ -337,11 +337,11 @@
                     landY: spot.y,
                     currentX: spot.x,
                     currentY: spot.y,
-                    size: 3 + Math.random() * 3,
+                    size: 4 + Math.random() * 4,
                     color: colors[Math.floor(Math.random() * colors.length)],
                     floatPhase: Math.random() * Math.PI * 2,
                     floatSpeed: 0.5 + Math.random() * 1.5,
-                    landPhase: Math.random() * 0.65,
+                    landPhase: Math.random() * 0.35, // start landing much earlier in the scroll
                     // Copy-paste jump properties
                     lastJumpTime: Date.now() + Math.random() * 8000,
                     nextJumpDelay: 4000 + Math.random() * 6000,
@@ -358,10 +358,12 @@
             ctx.clearRect(0, 0, W, H);
 
             const scrollMax = document.body.scrollHeight - H;
-            const progress = Math.min(1, window.scrollY / Math.max(1, scrollMax));
+            // Use a curve that accelerates early — 40% scroll = 70% progress
+            const rawProgress = Math.min(1, window.scrollY / Math.max(1, scrollMax));
+            const progress = Math.pow(rawProgress, 0.5); // sqrt makes early scroll more impactful
 
-            // Draw chromosomes — get more visible as you scroll
-            const chromoAlpha = 0.04 + progress * 0.10;
+            // Draw chromosomes — visible earlier and brighter
+            const chromoAlpha = 0.06 + progress * 0.16;
             chromosomes.forEach(chr => {
                 // Main chromosome body
                 ctx.fillStyle = `rgba(233, 69, 96, ${chromoAlpha})`;
@@ -395,7 +397,7 @@
 
             invaders.forEach((inv, idx) => {
                 const landStart = inv.landPhase;
-                const landEnd = landStart + 0.35;
+                const landEnd = landStart + 0.25; // land faster (25% of scroll range)
                 const rawT = Math.min(1, Math.max(0, (progress - landStart) / (landEnd - landStart)));
                 const ease = rawT * rawT * (3 - 2 * rawT);
 
@@ -403,11 +405,11 @@
 
                 if (ease < 1.0) {
                     // Still floating/landing
-                    const wobbleX = Math.sin(time * inv.floatSpeed + inv.floatPhase) * 15 * (1 - ease);
-                    const wobbleY = Math.cos(time * inv.floatSpeed * 0.7 + inv.floatPhase) * 10 * (1 - ease);
+                    const wobbleX = Math.sin(time * inv.floatSpeed + inv.floatPhase) * 20 * (1 - ease);
+                    const wobbleY = Math.cos(time * inv.floatSpeed * 0.7 + inv.floatPhase) * 14 * (1 - ease);
                     x = inv.startX + (inv.landX - inv.startX) * ease + wobbleX;
                     y = inv.startY + (inv.landY - inv.startY) * ease + wobbleY;
-                    alpha = 0.15 + ease * 0.35;
+                    alpha = 0.25 + ease * 0.45; // brighter: 25% floating → 70% landed
                 } else {
                     // Fully landed — check for copy-paste jump
                     if (!inv.isJumping && jumpingCount < 3 && now - inv.lastJumpTime > inv.nextJumpDelay) {
@@ -439,7 +441,7 @@
                         // Arc upward in the middle
                         y -= Math.sin(jt * Math.PI) * 40;
 
-                        alpha = 0.5 + Math.sin(jt * Math.PI) * 0.3; // pulse brighter during jump
+                        alpha = 0.6 + Math.sin(jt * Math.PI) * 0.35; // pulse brighter during jump
 
                         if (jt >= 1) {
                             // Landing complete
@@ -460,7 +462,7 @@
                     } else {
                         x = inv.currentX;
                         y = inv.currentY;
-                        alpha = 0.5;
+                        alpha = 0.65;
                     }
                 }
 
