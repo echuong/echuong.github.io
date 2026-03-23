@@ -309,26 +309,47 @@
             }
         }
 
+        // Ghost trails left behind by copy-paste jumps
+        let ghosts = [];
+        // Burst effects at landing sites
+        let bursts = [];
+
+        function pickChromoSpot() {
+            const chr = chromosomes[Math.floor(Math.random() * chromosomes.length)];
+            return {
+                x: chr.x + (Math.random() - 0.5) * chr.w * 0.8,
+                y: chr.y + Math.random() * chr.h
+            };
+        }
+
         function generateInvaders() {
             invaders = [];
+            ghosts = [];
+            bursts = [];
             const colors = ['#e94560', '#00d4ff', '#16c79a', '#f5f749', '#a855f7'];
             const count = 55 + Math.floor(Math.random() * 25);
             for (let i = 0; i < count; i++) {
-                // Each invader starts floating freely and has a target landing spot on a chromosome
-                const chromo = chromosomes[Math.floor(Math.random() * chromosomes.length)];
-                const landX = chromo.x + (Math.random() - 0.5) * chromo.w * 0.8;
-                const landY = chromo.y + Math.random() * chromo.h;
-
+                const spot = pickChromoSpot();
                 invaders.push({
                     startX: Math.random() * W,
                     startY: Math.random() * H,
-                    landX,
-                    landY,
+                    landX: spot.x,
+                    landY: spot.y,
+                    currentX: spot.x,
+                    currentY: spot.y,
                     size: 3 + Math.random() * 3,
                     color: colors[Math.floor(Math.random() * colors.length)],
                     floatPhase: Math.random() * Math.PI * 2,
                     floatSpeed: 0.5 + Math.random() * 1.5,
-                    landPhase: Math.random() * 0.65, // each invader starts landing at a different scroll point
+                    landPhase: Math.random() * 0.65,
+                    // Copy-paste jump properties
+                    lastJumpTime: Date.now() + Math.random() * 8000,
+                    nextJumpDelay: 4000 + Math.random() * 6000,
+                    isJumping: false,
+                    jumpStart: 0,
+                    jumpDuration: 400 + Math.random() * 200,
+                    jumpFromX: 0, jumpFromY: 0,
+                    jumpToX: 0, jumpToY: 0,
                 });
             }
         }
@@ -365,31 +386,88 @@
                 }
             });
 
-            // Draw invaders — interpolate from floating to landed based on scroll
+            // Draw invaders — interpolate from floating to landed, then copy-paste jump
             const time = Date.now() / 1000;
+            const now = Date.now();
+
+            // Count currently jumping invaders (limit to 3 at a time)
+            const jumpingCount = invaders.filter(i => i.isJumping).length;
+
             invaders.forEach((inv, idx) => {
-                // Each invader has its own landing threshold — they land progressively
-                const landStart = inv.landPhase; // 0..0.6 — when this invader starts landing
-                const landEnd = landStart + 0.35; // takes 35% of scroll to fully land
+                const landStart = inv.landPhase;
+                const landEnd = landStart + 0.35;
                 const rawT = Math.min(1, Math.max(0, (progress - landStart) / (landEnd - landStart)));
-                const ease = rawT * rawT * (3 - 2 * rawT); // smoothstep
+                const ease = rawT * rawT * (3 - 2 * rawT);
 
-                // Float wobble (decreases as they land)
-                const wobbleX = Math.sin(time * inv.floatSpeed + inv.floatPhase) * 15 * (1 - ease);
-                const wobbleY = Math.cos(time * inv.floatSpeed * 0.7 + inv.floatPhase) * 10 * (1 - ease);
+                let x, y, alpha;
 
-                const x = inv.startX + (inv.landX - inv.startX) * ease + wobbleX;
-                const y = inv.startY + (inv.landY - inv.startY) * ease + wobbleY;
+                if (ease < 1.0) {
+                    // Still floating/landing
+                    const wobbleX = Math.sin(time * inv.floatSpeed + inv.floatPhase) * 15 * (1 - ease);
+                    const wobbleY = Math.cos(time * inv.floatSpeed * 0.7 + inv.floatPhase) * 10 * (1 - ease);
+                    x = inv.startX + (inv.landX - inv.startX) * ease + wobbleX;
+                    y = inv.startY + (inv.landY - inv.startY) * ease + wobbleY;
+                    alpha = 0.15 + ease * 0.35;
+                } else {
+                    // Fully landed — check for copy-paste jump
+                    if (!inv.isJumping && jumpingCount < 3 && now - inv.lastJumpTime > inv.nextJumpDelay) {
+                        // Start a new jump!
+                        inv.isJumping = true;
+                        inv.jumpStart = now;
+                        inv.jumpFromX = inv.currentX;
+                        inv.jumpFromY = inv.currentY;
+                        const target = pickChromoSpot();
+                        inv.jumpToX = target.x;
+                        inv.jumpToY = target.y;
 
-                // Alpha: dim when floating, glow when landed
-                const alpha = 0.15 + ease * 0.35;
+                        // Leave a ghost "copy" at old position
+                        ghosts.push({
+                            x: inv.currentX, y: inv.currentY,
+                            size: inv.size, color: inv.color,
+                            born: now, life: 800
+                        });
+                    }
 
-                // Draw a tiny pixel invader shape
+                    if (inv.isJumping) {
+                        // Animate the jump with an arc
+                        const elapsed = now - inv.jumpStart;
+                        const jt = Math.min(1, elapsed / inv.jumpDuration);
+                        const jEase = jt * jt * (3 - 2 * jt);
+
+                        x = inv.jumpFromX + (inv.jumpToX - inv.jumpFromX) * jEase;
+                        y = inv.jumpFromY + (inv.jumpToY - inv.jumpFromY) * jEase;
+                        // Arc upward in the middle
+                        y -= Math.sin(jt * Math.PI) * 40;
+
+                        alpha = 0.5 + Math.sin(jt * Math.PI) * 0.3; // pulse brighter during jump
+
+                        if (jt >= 1) {
+                            // Landing complete
+                            inv.isJumping = false;
+                            inv.currentX = inv.jumpToX;
+                            inv.currentY = inv.jumpToY;
+                            inv.landX = inv.jumpToX;
+                            inv.landY = inv.jumpToY;
+                            inv.lastJumpTime = now;
+                            inv.nextJumpDelay = 4000 + Math.random() * 6000;
+
+                            // Burst effect at landing
+                            bursts.push({
+                                x: inv.jumpToX, y: inv.jumpToY,
+                                color: inv.color, born: now, life: 500
+                            });
+                        }
+                    } else {
+                        x = inv.currentX;
+                        y = inv.currentY;
+                        alpha = 0.5;
+                    }
+                }
+
+                // Draw the invader
                 const s = inv.size;
                 ctx.fillStyle = inv.color;
                 ctx.globalAlpha = alpha;
-
-                // Simple 3x3 invader silhouette
                 ctx.fillRect(x - s, y - s, s, s);
                 ctx.fillRect(x + s, y - s, s, s);
                 ctx.fillRect(x, y, s, s);
@@ -397,15 +475,48 @@
                 ctx.fillRect(x + s, y + s, s, s);
 
                 // Glow when landed
-                if (ease > 0.7) {
+                if (ease >= 0.7 && !inv.isJumping) {
                     ctx.shadowColor = inv.color;
-                    ctx.shadowBlur = 6 * (ease - 0.7) / 0.3;
+                    ctx.shadowBlur = 4;
                     ctx.fillRect(x, y, s, s);
                     ctx.shadowBlur = 0;
                 }
 
                 ctx.globalAlpha = 1;
             });
+
+            // Draw ghost copies (fading out at old positions)
+            for (let i = ghosts.length - 1; i >= 0; i--) {
+                const g = ghosts[i];
+                const age = now - g.born;
+                if (age > g.life) { ghosts.splice(i, 1); continue; }
+                const fade = 1 - age / g.life;
+                ctx.globalAlpha = fade * 0.3;
+                ctx.fillStyle = g.color;
+                const s = g.size;
+                ctx.fillRect(g.x - s, g.y - s, s, s);
+                ctx.fillRect(g.x + s, g.y - s, s, s);
+                ctx.fillRect(g.x, g.y, s, s);
+                ctx.fillRect(g.x - s, g.y + s, s, s);
+                ctx.fillRect(g.x + s, g.y + s, s, s);
+                ctx.globalAlpha = 1;
+            }
+
+            // Draw burst effects (expanding ring at insertion site)
+            for (let i = bursts.length - 1; i >= 0; i--) {
+                const b = bursts[i];
+                const age = now - b.born;
+                if (age > b.life) { bursts.splice(i, 1); continue; }
+                const t = age / b.life;
+                const radius = 3 + t * 18;
+                ctx.globalAlpha = (1 - t) * 0.4;
+                ctx.strokeStyle = b.color;
+                ctx.lineWidth = 1.5 * (1 - t);
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, radius, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+            }
 
             requestAnimationFrame(drawFrame);
         }

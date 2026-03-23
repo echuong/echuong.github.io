@@ -318,12 +318,12 @@ a:hover {
 
 /* Team section: transparent to show genome animation */
 #team.section-alt {
-    background: rgba(26, 26, 46, 0.4);
+    background: rgba(26, 26, 46, 0.25);
 }
 
-/* Funding section: slightly transparent too */
+/* Funding section: transparent to show genome animation */
 #funding.section-alt {
-    background: rgba(26, 26, 46, 0.7);
+    background: rgba(26, 26, 46, 0.35);
 }
 .section-alt > * {
     max-width: 1100px;
@@ -748,6 +748,23 @@ a:hover {
     padding-left: 12px;
     border-left: 2px solid rgba(0, 212, 255, 0.15);
     font-style: italic;
+}
+
+.pub-press {
+    font-size: 11px;
+    margin-top: 6px;
+    padding-left: 12px;
+    color: var(--text-muted);
+}
+.pub-press a {
+    color: var(--neon-cyan);
+    text-decoration: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+.pub-press a:hover {
+    opacity: 1;
+    text-decoration: underline;
 }
 
 .pub-item.featured {
