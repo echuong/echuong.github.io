@@ -147,8 +147,8 @@ a:hover {
     overflow: hidden;
     background:
         radial-gradient(ellipse at 50% 0%, rgba(233, 69, 96, 0.08) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 80%, rgba(0, 212, 255, 0.05) 0%, transparent 50%),
-        var(--bg-dark);
+        radial-gradient(ellipse at 80% 80%, rgba(0, 212, 255, 0.05) 0%, transparent 50%);
+    /* No solid bg — lets the genome-bg canvas show through */
 }
 
 .invaders-field {
@@ -970,10 +970,11 @@ footer .pixel-font {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 0;
+    z-index: 10;  /* Canvas renders ABOVE content as an overlay */
+    pointer-events: none;
 }
 
-/* Ensure all page content sits above the canvas */
+/* Content at normal z-index — canvas overlays on top */
 #nav { z-index: 1000 !important; position: fixed; }
 .hero { position: relative; z-index: 1; }
 section.section { position: relative; z-index: 1; }
