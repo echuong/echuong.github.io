@@ -329,17 +329,15 @@ a:hover {
 
 .section-alt {
     max-width: none;
-    background: var(--bg-section);
+    background: transparent;
 }
 
-/* Team section: transparent to show genome animation */
 #team.section-alt {
-    background: rgba(26, 26, 46, 0.25);
+    background: transparent;
 }
 
-/* Funding section: transparent to show genome animation */
 #funding.section-alt {
-    background: rgba(26, 26, 46, 0.35);
+    background: transparent;
 }
 .section-alt > * {
     max-width: 1100px;
@@ -393,7 +391,7 @@ a:hover {
 }
 
 .research-card {
-    background: var(--bg-card);
+    background: rgba(22, 33, 62, 0.8);
     border: 1px solid rgba(233, 69, 96, 0.2);
     padding: 28px;
     position: relative;
@@ -701,8 +699,9 @@ a:hover {
 .pub-item {
     display: flex;
     gap: 12px;
-    padding: 14px 0;
+    padding: 14px 12px;
     border-bottom: 1px solid rgba(255,255,255,0.04);
+    background: rgba(15, 14, 23, 0.7);
     align-items: flex-start;
 }
 .pub-item:last-child {
@@ -876,11 +875,12 @@ a:hover {
 }
 
 .news-item {
-    padding: 12px 0;
+    padding: 12px;
     border-bottom: 1px solid rgba(255,255,255,0.04);
     display: flex;
     gap: 12px;
     align-items: flex-start;
+    background: rgba(15, 14, 23, 0.7);
 }
 
 .news-date {
@@ -897,6 +897,10 @@ a:hover {
     color: var(--text-primary);
 }
 
+.contact-info {
+    background: rgba(15, 14, 23, 0.7);
+    padding: 16px;
+}
 .contact-info p {
     margin-bottom: 16px;
     font-size: 14px;

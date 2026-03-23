@@ -341,7 +341,7 @@
                     color: colors[Math.floor(Math.random() * colors.length)],
                     floatPhase: Math.random() * Math.PI * 2,
                     floatSpeed: 0.5 + Math.random() * 1.5,
-                    landPhase: Math.random() * 0.35, // start landing much earlier in the scroll
+                    landPhase: Math.random() * 0.2 - 0.15, // range -0.15 to 0.05: most already landing at page load
                     // Copy-paste jump properties
                     lastJumpTime: Date.now() + Math.random() * 8000,
                     nextJumpDelay: 4000 + Math.random() * 6000,
@@ -362,8 +362,8 @@
             const rawProgress = Math.min(1, window.scrollY / Math.max(1, scrollMax));
             const progress = Math.pow(rawProgress, 0.5); // sqrt makes early scroll more impactful
 
-            // Draw chromosomes — visible earlier and brighter
-            const chromoAlpha = 0.06 + progress * 0.16;
+            // Draw chromosomes — visible from the start
+            const chromoAlpha = 0.10 + progress * 0.14;
             chromosomes.forEach(chr => {
                 // Main chromosome body
                 ctx.fillStyle = `rgba(233, 69, 96, ${chromoAlpha})`;
@@ -382,7 +382,7 @@
                 const bandH = chr.h / chr.bands;
                 for (let b = 0; b < chr.bands; b++) {
                     if (b % 2 === 0) {
-                        ctx.fillStyle = `rgba(0, 212, 255, ${chromoAlpha * 0.5})`;
+                        ctx.fillStyle = `rgba(0, 212, 255, ${chromoAlpha * 0.7})`;
                         ctx.fillRect(chr.x - r + 2, chr.y + b * bandH, chr.w - 4, bandH * 0.6);
                     }
                 }
@@ -493,7 +493,7 @@
                 const age = now - g.born;
                 if (age > g.life) { ghosts.splice(i, 1); continue; }
                 const fade = 1 - age / g.life;
-                ctx.globalAlpha = fade * 0.3;
+                ctx.globalAlpha = fade * 0.4;
                 ctx.fillStyle = g.color;
                 const s = g.size;
                 ctx.fillRect(g.x - s, g.y - s, s, s);
