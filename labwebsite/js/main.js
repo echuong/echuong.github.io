@@ -341,7 +341,7 @@
                     color: colors[Math.floor(Math.random() * colors.length)],
                     floatPhase: Math.random() * Math.PI * 2,
                     floatSpeed: 0.5 + Math.random() * 1.5,
-                    landPhase: Math.random() * 0.2 - 0.15, // range -0.15 to 0.05: most already landing at page load
+                    landPhase: Math.random() * 0.35, // range 0.0 to 0.35: land during hero→research scroll
                     // Copy-paste jump properties
                     lastJumpTime: Date.now() + Math.random() * 8000,
                     nextJumpDelay: 4000 + Math.random() * 6000,
@@ -358,12 +358,11 @@
             ctx.clearRect(0, 0, W, H);
 
             const scrollMax = document.body.scrollHeight - H;
-            // Use a curve that accelerates early — 40% scroll = 70% progress
             const rawProgress = Math.min(1, window.scrollY / Math.max(1, scrollMax));
-            const progress = Math.pow(rawProgress, 0.5); // sqrt makes early scroll more impactful
+            const progress = rawProgress; // linear — lets landing animation play out naturally
 
-            // Draw chromosomes — visible from the start
-            const chromoAlpha = 0.10 + progress * 0.14;
+            // Draw chromosomes — faint at top, strong as you scroll
+            const chromoAlpha = 0.04 + progress * 0.20;
             chromosomes.forEach(chr => {
                 // Main chromosome body
                 ctx.fillStyle = `rgba(233, 69, 96, ${chromoAlpha})`;
@@ -397,7 +396,7 @@
 
             invaders.forEach((inv, idx) => {
                 const landStart = inv.landPhase;
-                const landEnd = landStart + 0.25; // land faster (25% of scroll range)
+                const landEnd = landStart + 0.20; // each invader takes 20% of scroll to land
                 const rawT = Math.min(1, Math.max(0, (progress - landStart) / (landEnd - landStart)));
                 const ease = rawT * rawT * (3 - 2 * rawT);
 
@@ -411,8 +410,8 @@
                     y = inv.startY + (inv.landY - inv.startY) * ease + wobbleY;
                     alpha = 0.25 + ease * 0.45; // brighter: 25% floating → 70% landed
                 } else {
-                    // Fully landed — check for copy-paste jump
-                    if (!inv.isJumping && jumpingCount < 3 && now - inv.lastJumpTime > inv.nextJumpDelay) {
+                    // Fully landed — copy-paste jump only after scrolling past hero (~30% progress)
+                    if (!inv.isJumping && jumpingCount < 3 && progress > 0.3 && now - inv.lastJumpTime > inv.nextJumpDelay) {
                         // Start a new jump!
                         inv.isJumping = true;
                         inv.jumpStart = now;
