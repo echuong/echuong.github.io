@@ -215,6 +215,22 @@ a:hover {
     clip-path: inset(40% 0 0 0);
 }
 
+/* Section-title glitch — text-shadow based, no pseudo-elements needed */
+.section-title.glitch {
+    transition: text-shadow 0.1s;
+}
+.section-title.glitch:hover {
+    animation: section-glitch 0.3s infinite;
+}
+@keyframes section-glitch {
+    0% { text-shadow: 2px 0 var(--neon-cyan), -2px 0 var(--neon-pink); }
+    20% { text-shadow: -2px 1px var(--neon-cyan), 2px -1px var(--neon-pink); }
+    40% { text-shadow: 2px -1px var(--neon-cyan), -3px 1px var(--neon-pink); }
+    60% { text-shadow: -1px 2px var(--neon-cyan), 1px -2px var(--neon-pink); }
+    80% { text-shadow: 3px 0 var(--neon-cyan), -2px 0 var(--neon-pink); }
+    100% { text-shadow: -2px 1px var(--neon-cyan), 2px -1px var(--neon-pink); }
+}
+
 @keyframes glitch-1 {
     0% { transform: translate(0); }
     20% { transform: translate(-3px, 2px); }
