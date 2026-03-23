@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuong Lab | Genome Invaders</title>
+    <meta name="description" content="Chuong Lab at CU Boulder — Transposable elements, genome evolution, and immune gene regulation">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🧬</text></svg>">
+</head>
+<body>
+
+<!-- Scanline overlay -->
+<div class="scanlines"></div>
+
+<!-- Scrolling chromosome background canvas -->
+<canvas id="genome-bg" class="genome-bg"></canvas>
+
+<!-- Navigation -->
+<nav id="nav">
+    <div class="nav-inner">
+        <a href="#home" class="nav-logo">CL</a>
+        <div class="nav-links">
+            <a href="#research">Research</a>
+            <a href="#team">Team</a>
+            <a href="#publications">Papers</a>
+            <a href="gallery.html">Photos</a>
+            <a href="#funding">Funding</a>
+            <a href="#news">News</a>
+        </div>
+        <button class="nav-toggle" aria-label="Menu">&#9776;</button>
+    </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section id="home" class="hero">
+    <div class="invaders-field" id="invaders-field">
+        <!-- JS populates Space Invader sprites here -->
+    </div>
+    <div class="hero-content">
+        <h1 class="glitch" data-text="CHUONG LAB">CHUONG LAB</h1>
+        <p class="hero-sub pixel-font">&#60; GENOME INVADERS &#62;</p>
+        <p class="hero-desc">We study <span class="highlight">transposable elements</span> &mdash; virus-like genetic parasites that comprise over half the human genome. Using computational and experimental approaches, we investigate how these &ldquo;genome invaders&rdquo; have shaped immune gene regulation, generated novel protein isoforms, and become dysregulated in cancer.</p>
+        <p class="hero-affil">BioFrontiers Institute &amp; Dept. of MCDB<br>University of Colorado Boulder</p>
+        <div class="hero-cta">
+            <a href="#research" class="btn btn-primary">START &gt;</a>
+        </div>
+    </div>
+    <div class="chromosome-ground" id="chromosome-ground">
+        <!-- Pixel chromosome landscape at bottom -->
+    </div>
+</section>
+
+<!-- ============ RESEARCH ============ -->
+<section id="research" class="section">
+    <h2 class="section-title pixel-font">
+        <span class="title-icon">&#x1F52C;</span> RESEARCH
+        <span class="blink">_</span>
+    </h2>
+    <p class="section-intro">Three levels of transposon biology — from genome-wide co-option to disease dysregulation.</p>
+
+    <div class="research-grid">
+        <!-- Level 1 -->
+        <div class="research-card">
+            <div class="card-header">
+                <span class="level-badge">AREA 1</span>
+                <div class="invader-icon invader-line"></div>
+            </div>
+            <h3>Regulatory Co-option</h3>
+            <p>Transposable elements carry ancestral viral regulatory sequences — transcription factor binding sites — that the host genome repurposes as enhancers, promoters, and insulators. We discovered that endogenous retroviruses (ERVs) were co-opted as interferon-inducible enhancers regulating innate immune genes like <em>AIM2</em> and <em>APOL1</em>. This is not limited to primates: we've shown parallel co-option of LINE-2 elements in cattle and B2 SINEs in mice, revealing a general evolutionary mechanism across mammals.</p>
+            <div class="card-refs">
+                Key references: Chuong et al., <em>Science</em> 2016 &bull; Kelly et al., <em>Genome Res</em> 2022 &bull; Horton et al., <em>eLife</em> 2023 &bull; Buttler et al., <em>Mobile DNA</em> 2023
+            </div>
+        </div>
+
+        <!-- Level 2 -->
+        <div class="research-card">
+            <div class="card-header">
+                <span class="level-badge">AREA 2</span>
+                <div class="invader-icon invader-sine"></div>
+            </div>
+            <h3>TE-Derived Isoforms</h3>
+            <p>Intronic transposable elements can be spliced into host mRNAs as non-canonical exons — a process called exonization. We discovered that an Alu element creates a truncated "decoy" isoform of the interferon receptor IFNAR2. This primate-specific isoform (IFNAR2-S) is secreted, binds IFN-&beta; with high affinity, and suppresses interferon signaling — acting as a dominant-negative regulator. We're now using long-read transcriptomics to systematically discover TE-derived isoforms across immune genes.</p>
+            <div class="card-refs">
+                Key references: Pasquesi et al., <em>Cell</em> 2024 &bull; Dziulko et al., <em>HMG</em> 2024 &bull; Pasquesi et al., <em>Mobile DNA</em> 2022
+            </div>
+        </div>
+
+        <!-- Level 3 -->
+        <div class="research-card">
+            <div class="card-header">
+                <span class="level-badge">AREA 3</span>
+                <div class="invader-icon invader-erv"></div>
+            </div>
+            <h3>TEs in Cancer</h3>
+            <p>Transposable elements that are normally silenced can become reactivated in cancer, creating aberrant enhancers and splice variants. We showed that LTR10 endogenous retroviruses are reactivated as cancer-specific enhancers in colorectal cancer, driven by MAPK/AP-1 signaling. These TE enhancers regulate cancer-relevant genes and can be inhibited by MEK inhibitors, suggesting they are potential therapeutic targets. We're also investigating how IFNAR2 splicing dysregulation in ovarian cancer affects immunotherapy response.</p>
+            <div class="card-refs">
+                Key references: Ivancevic et al., <em>Sci Adv</em> 2024
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ TEAM ============ -->
+<section id="team" class="section section-alt">
+    <h2 class="section-title pixel-font">
+        <span class="title-icon">&#x1F468;&#x200D;&#x1F52C;</span> TEAM
+        <span class="blink">_</span>
+    </h2>
+    <p class="section-intro">The Chuong lab is dedicated to promoting an inclusive and welcoming environment for scientists from all backgrounds.</p>
+
+    <div class="team-grid">
+        <div class="team-card team-pi" data-member="ed-chuong">
+            <div class="avatar-frame"><img src="images/headshots/ed_chuong.jpg" alt="Ed Chuong"></div>
+            <h3>Ed Chuong</h3>
+            <span class="team-role">Principal Investigator</span>
+            <p>Associate Professor, MCDB &amp; BioFrontiers</p>
+        </div>
+
+        <div class="team-card" data-member="giulia-pasquesi">
+            <div class="avatar-frame"><img src="images/headshots/giulia_pasquesi.jpg" alt="Giulia Pasquesi"></div>
+            <h3>Giulia Pasquesi</h3>
+            <span class="team-role">Postdoc &bull; Sie Fellow &bull; NIH K99</span>
+            <p>TE-derived isoforms &amp; IFN signaling</p>
+        </div>
+
+        <div class="team-card" data-member="holly-allen">
+            <div class="avatar-frame"><img src="images/headshots/holly_allen.jpg" alt="Holly Allen"></div>
+            <h3>Holly Allen</h3>
+            <span class="team-role">Lab Manager / Staff Scientist</span>
+            <p>BioFrontiers Institute</p>
+        </div>
+
+        <div class="team-card" data-member="atma-ivancevic">
+            <div class="avatar-frame"><img src="images/headshots/atma_ivancevic.jpg" alt="Atma Ivancevic"></div>
+            <h3>Atma Ivancevic</h3>
+            <span class="team-role">Research Associate</span>
+            <p>Computational genomics &amp; TE biology</p>
+        </div>
+
+        <div class="team-card" data-member="lynn-sanford">
+            <div class="avatar-frame"><img src="images/headshots/lynn_sanford.jpg" alt="Lynn Sanford"></div>
+            <h3>Lynn Sanford</h3>
+            <span class="team-role">Research Staff</span>
+            <p>TE regulatory switches in cancer</p>
+        </div>
+
+        <div class="team-card" data-member="mia-chaw">
+            <div class="avatar-frame"><img src="images/headshots/mia_chaw.jpg" alt="Mia Chaw"></div>
+            <h3>Mia Chaw</h3>
+            <span class="team-role">Professional Research Assistant</span>
+            <p>BioFrontiers Institute</p>
+        </div>
+
+        <div class="team-card" data-member="olivia-joyner">
+            <div class="avatar-frame"><img src="images/headshots/olivia_joyner.jpg" alt="Olivia Joyner"></div>
+            <h3>Olivia Joyner</h3>
+            <span class="team-role">Graduate Student &bull; MCDB</span>
+            <p>TEs as regulatory elements in disease</p>
+        </div>
+
+        <div class="team-card" data-member="andrea-ordonez">
+            <div class="avatar-frame"><img src="images/headshots/andrea_ordonez.jpg" alt="Andrea Ordonez"></div>
+            <h3>Andrea Ordonez</h3>
+            <span class="team-role">Graduate Student &bull; MCDB</span>
+            <p>Novel TE-derived receptor isoforms</p>
+        </div>
+
+        <div class="team-card" data-member="jimmy-pazzanese">
+            <div class="avatar-frame"><img src="images/headshots/jimmy_pazzanese.png" alt="Jimmy Pazzanese Jr"></div>
+            <h3>Jimmy Pazzanese Jr</h3>
+            <span class="team-role">Graduate Student &bull; MCDB</span>
+            <p>TE-containing splice isoforms</p>
+        </div>
+
+        <div class="team-card" data-member="carolina-valderrama">
+            <div class="avatar-frame"><img src="images/headshots/carolina_valderrama.jpg" alt="Carolina Valderrama Hincapie"></div>
+            <h3>Carolina Valderrama Hincapie</h3>
+            <span class="team-role">Graduate Student &bull; MCDB/IQ Bio</span>
+            <p>Co-advised with Kasinath lab</p>
+        </div>
+
+        <div class="team-card" data-member="ashley-agyepong">
+            <div class="avatar-frame"><img src="images/headshots/ashley_agyepong.jpg" alt="Ashley Agyepong"></div>
+            <h3>Ashley Agyepong</h3>
+            <span class="team-role">Undergraduate &bull; Boettcher Scholar</span>
+            <p>MCDB</p>
+        </div>
+    </div>
+
+    <!-- Member Bio Modal -->
+    <div id="member-modal" class="member-modal" aria-hidden="true">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close">&times;</button>
+            <div class="modal-body">
+                <img id="modal-photo" class="modal-photo" src="" alt="">
+                <div class="modal-info">
+                    <h3 id="modal-name"></h3>
+                    <span id="modal-role" class="team-role"></span>
+                    <p id="modal-bio"></p>
+                    <a id="modal-email" href="" class="modal-email-link"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alumni -->
+    <div class="alumni-section">
+        <h3 class="pixel-font small" style="color: var(--neon-cyan); margin-bottom: 16px;">ALUMNI</h3>
+        <div class="alumni-list">
+            <span>Carmen Buttler <em>(Scientist, Darwin Biosciences)</em></span>
+            <span>Yazmyn Chavez <em>(Medical Assistant, Injury Solutions)</em></span>
+            <span>Adam Dziulko <em>(Grad student, MCDB/IQ Bio)</em></span>
+            <span>Keala Gapin <em>(PhD, Stanford Immunology)</em></span>
+            <span>Stella Haskins <em>(UC Santa Barbara)</em></span>
+            <span>Alex Hirano <em>(Technician, Mass General Hospital)</em></span>
+            <span>Bella Horton <em>(MD/PhD, U. Maryland)</em></span>
+            <span>Doreen Idonije</span>
+            <span>Abigail Jeong <em>(Research, U. Regensberg)</em></span>
+            <span>Conor Kelly <em>(PhD, UW Genome Sciences)</em></span>
+            <span>Tania Lara <em>(Metro State University)</em></span>
+            <span>Alice Mueller <em>(PhD, Johns Hopkins)</em></span>
+            <span>Chris Mulligan <em>(PhD, UC Davis)</em></span>
+            <span>Lily Nguyen <em>(MD, CU Anschutz)</em></span>
+            <span>David Simpson <em>(Lab Ops Manager, Arpeggio Biosciences)</em></span>
+            <span>Rebecca Su <em>(PhD, Weill Cornell Medicine)</em></span>
+            <span>Kevin Veno <em>(NSA)</em></span>
+            <span>Yuanyuan Xie <em>(BD Senior Manager, Worg Pharma)</em></span>
+        </div>
+    </div>
+
+    <div class="team-join">
+        <p class="pixel-font small">JOIN THE TEAM?</p>
+        <p>Ed accepts PhD students through MCDB, BCHM, or IQ Biology programs. Inquiries about technician or postdoctoral positions: <a href="mailto:edward.chuong@colorado.edu">edward.chuong@colorado.edu</a></p>
+    </div>
+</section>
+
+<!-- ============ PUBLICATIONS ============ -->
+<section id="publications" class="section">
+    <h2 class="section-title pixel-font">
+        <span class="title-icon">&#x1F4DC;</span> PUBLICATIONS
+        <span class="blink">_</span>
+    </h2>
+    <p class="section-intro">Selected papers from the lab.</p>
+
+    <div class="pub-list">
+
+        <div class="pub-item">
+            <span class="pub-year">2025</span>
+
+            <div class="pub-text">
+                <a href="https://www.nature.com/articles/s41586-025-09152-2" target="_blank" rel="noopener" class="pub-title">SP140&ndash;RESIST pathway regulates interferon mRNA stability and antiviral immunity</a>
+                <span class="pub-authors">Witt KC, Dziulko A, An J, et al.; <strong>Chuong EB</strong>, Vance RE. <em>Nature</em> 2025.</span>
+            </div>
+        </div>
+
+        <div class="pub-item">
+            <span class="pub-year">2024</span>
+
+            <div class="pub-text">
+                <a href="https://www.cell.com/cell/fulltext/S0092-8674(24)01333-3" target="_blank" rel="noopener" class="pub-title">Regulation of human interferon signaling by transposon exonization</a>
+                <span class="pub-authors">Pasquesi GIM, Allen H, Ivancevic A, et al.; <strong>Chuong EB</strong>. <em>Cell</em> 2024.</span>
+            </div>
+        </div>
+
+        <div class="pub-item">
+            <span class="pub-year">2024</span>
+
+            <div class="pub-text">
+                <a href="https://www.science.org/doi/10.1126/sciadv.ado1218" target="_blank" rel="noopener" class="pub-title">Endogenous retroviruses mediate transcriptional rewiring in response to oncogenic signaling in colorectal cancer</a>
+                <span class="pub-authors">Ivancevic A, Simpson DM, Joyner OM, et al.; <strong>Chuong EB</strong>. <em>Science Advances</em> 2024.</span>
+            </div>
+        </div>
+
+        <div class="pub-item">
+            <span class="pub-year">2023</span>
+
+            <div class="pub-text">
+                <a href="https://elifesciences.org/articles/82617" target="_blank" rel="noopener" class="pub-title">Mouse B2 SINE elements function as IFN-inducible enhancers</a>
+                <span class="pub-authors">Horton I, Kelly CJ, Dziulko A, Simpson DM, <strong>Chuong EB</strong>. <em>eLife</em> 2023.</span>
+            </div>
+        </div>
+
+        <div class="pub-item">
+            <span class="pub-year">2022</span>
+
+            <div class="pub-text">
+                <a href="https://genome.cshlp.org/content/early/2022/08/09/gr.276241.121.abstract" target="_blank" rel="noopener" class="pub-title">Ruminant-specific retrotransposons shape regulatory evolution of bovine immunity</a>
+                <span class="pub-authors">Kelly CJ, Chitko-McKown C, <strong>Chuong EB</strong>. <em>Genome Research</em> 2022.</span>
+            </div>
+        </div>
+
+        <div class="pub-item">
+            <span class="pub-year">2017</span>
+
+            <div class="pub-text">
+                <a href="http://www.nature.com/nrg/journal/vaop/ncurrent/full/nrg.2016.139.html" target="_blank" rel="noopener" class="pub-title">Regulatory activities of transposable elements: from conflicts to benefits</a>
+                <span class="pub-authors"><strong>Chuong EB</strong>, Elde NC, Feschotte C. <em>Nature Reviews Genetics</em> 2017.</span>
+            </div>
+        </div>
+
+        <div class="pub-item">
+            <span class="pub-year">2016</span>
+
+            <div class="pub-text">
+                <a href="http://science.sciencemag.org/content/351/6277/1083" target="_blank" rel="noopener" class="pub-title">Regulatory evolution of innate immunity through co-option of endogenous retroviruses</a>
+                <span class="pub-authors"><strong>Chuong EB</strong>, Elde NC, Feschotte C. <em>Science</em> 2016.</span>
+            </div>
+        </div>
+
+    </div>
+
+    <div style="text-align: center; margin-top: 32px;">
+        <a href="publications.html" class="btn btn-primary" style="font-size: 0.75rem;">View all publications &rarr;</a>
+    </div>
+</section>
+
+<!-- ============ FUNDING ============ -->
+<section id="funding" class="section section-alt">
+    <h2 class="section-title pixel-font">
+        <span class="title-icon">&#x1F3C6;</span> FUNDING
+        <span class="blink">_</span>
+    </h2>
+    <p class="section-intro">We are grateful for support from these agencies.</p>
+
+    <div class="funding-grid">
+        <div class="funding-card active-grant">
+            <div class="trophy">&#x1F31F;</div>
+            <h3>Cancer Research Institute</h3>
+            <p>Lloyd J. Old STAR Award</p>
+            <span class="funding-years">2025&ndash;2030</span>
+        </div>
+
+        <div class="funding-card active-grant">
+            <div class="trophy">&#x1F31F;</div>
+            <h3>Department of Defense</h3>
+            <p>CDMRP (Co-PI with Dr. Benjamin Bitler)</p>
+            <span class="funding-years">2025&ndash;2029</span>
+        </div>
+
+        <div class="funding-card active-grant">
+            <div class="trophy">&#x1F31F;</div>
+            <h3>National Institutes of Health</h3>
+            <p>R35 MIRA Outstanding Investigator Award</p>
+            <span class="funding-years">2018&ndash;2029</span>
+        </div>
+
+        <div class="funding-card active-grant">
+            <div class="trophy">&#x1F31F;</div>
+            <h3>David &amp; Lucile Packard Foundation</h3>
+            <p>Packard Fellowship for Science &amp; Engineering</p>
+            <span class="funding-years">2020&ndash;2025</span>
+        </div>
+
+        <div class="funding-card active-grant">
+            <div class="trophy">&#x1F31F;</div>
+            <h3>American Cancer Society</h3>
+            <p>Discovery Boost Grant</p>
+            <span class="funding-years">2024&ndash;2025</span>
+        </div>
+
+        <div class="funding-card active-grant">
+            <div class="trophy">&#x1F31F;</div>
+            <h3>University of Colorado</h3>
+            <p>Marvin H. Caruthers Endowed Chair</p>
+            <span class="funding-years">Current</span>
+        </div>
+
+        <div class="funding-card past-grant">
+            <div class="trophy">&#x2605;</div>
+            <h3>Alfred P. Sloan Foundation</h3>
+            <p>Research Fellowship</p>
+            <span class="funding-years">2019&ndash;2021</span>
+        </div>
+
+        <div class="funding-card past-grant">
+            <div class="trophy">&#x2605;</div>
+            <h3>Boettcher Foundation</h3>
+            <p>Webb-Waring Biomedical Research Award</p>
+            <span class="funding-years">2018&ndash;2021</span>
+        </div>
+    </div>
+</section>
+
+<!-- ============ NEWS & CONTACT ============ -->
+<section id="news" class="section">
+    <h2 class="section-title pixel-font">
+        <span class="title-icon">&#x1F4E1;</span> NEWS &amp; CONTACT
+        <span class="blink">_</span>
+    </h2>
+
+    <div class="news-contact-grid">
+        <div class="news-col">
+            <h3 class="pixel-font small">LATEST</h3>
+            <div class="news-item">
+                <span class="news-date">2025</span>
+                <p>New paper in collaboration with Russell Vance&rsquo;s lab (Berkeley) in <em>Nature</em> on the SP140&ndash;RESIST pathway and interferon mRNA stability!</p>
+            </div>
+            <div class="news-item">
+                <span class="news-date">2025</span>
+                <p>Ed receives the Cancer Research Institute Lloyd J. Old STAR Award.</p>
+            </div>
+            <div class="news-item">
+                <span class="news-date">2024</span>
+                <p>IFNAR2 decoy receptor paper published in <em>Cell</em>.</p>
+            </div>
+            <div class="news-item">
+                <span class="news-date">2024</span>
+                <p>LTR10 cancer enhancer paper published in <em>Science Advances</em>.</p>
+            </div>
+            <div class="news-item">
+                <span class="news-date">2024</span>
+                <p>SP140/ERV paper published in <em>Human Molecular Genetics</em>.</p>
+            </div>
+        </div>
+
+        <div class="contact-col">
+            <h3 class="pixel-font small">CONTACT</h3>
+            <div class="contact-info">
+                <p><strong>Edward Chuong, PhD</strong><br>
+                Associate Professor<br>
+                MCDB &amp; BioFrontiers Institute<br>
+                University of Colorado Boulder</p>
+
+                <p>
+                    <span class="contact-label">EMAIL</span>
+                    <a href="mailto:edward.chuong@colorado.edu">edward.chuong@colorado.edu</a>
+                </p>
+                <p>
+                    <span class="contact-label">BLUESKY</span>
+                    <a href="https://bsky.app/profile/edchuong.bsky.social" target="_blank" rel="noopener">@edchuong.bsky.social</a>
+                </p>
+                <p>
+                    <span class="contact-label">OFFICE</span>
+                    JSCBB (BioFrontiers), University of Colorado Boulder
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+    <div class="footer-inner">
+        <div class="footer-invader"></div>
+        <p class="pixel-font small">CHUONG LAB &copy; 2026 | CU BOULDER</p>
+        <p class="footer-sub">piggyBot</p>
+    </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

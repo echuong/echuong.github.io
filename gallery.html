@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuong Lab | Photo Gallery</title>
+    <meta name="description" content="Photo gallery from the Chuong Lab at CU Boulder">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🧬</text></svg>">
+    <style>
+        /* Gallery-specific styles */
+        .gallery-page {
+            padding: 120px 24px 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .gallery-page .section-title {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .gallery-back {
+            display: inline-block;
+            margin-bottom: 24px;
+            color: var(--neon-cyan);
+            text-decoration: none;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+        }
+        .gallery-back:hover {
+            color: var(--neon-green);
+        }
+        .year-section {
+            margin-bottom: 48px;
+        }
+        .year-header {
+            font-family: 'Press Start 2P', cursive;
+            color: var(--neon-green);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+        .masonry-grid {
+            column-count: 4;
+            column-gap: 12px;
+        }
+        .gallery-item {
+            break-inside: avoid;
+            margin-bottom: 12px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 255, 65, 0.15);
+            transition: border-color 0.3s;
+        }
+        .gallery-item:hover {
+            border-color: var(--neon-green);
+        }
+        .gallery-item img {
+            width: 100%;
+            display: block;
+            transition: transform 0.3s;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.03);
+        }
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 8px 10px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.3;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+        .gallery-item:hover .gallery-caption {
+            transform: translateY(0);
+        }
+
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(0, 0, 0, 0.95);
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .lightbox.active {
+            display: flex;
+        }
+        .lightbox-img-wrap {
+            max-width: 90vw;
+            max-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .lightbox-img-wrap img {
+            max-width: 90vw;
+            max-height: 80vh;
+            object-fit: contain;
+            border: 2px solid var(--neon-green);
+            border-radius: 4px;
+        }
+        .lightbox-caption {
+            color: #ccc;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            text-align: center;
+            max-width: 700px;
+            padding: 0 20px;
+        }
+        .lightbox-close,
+        .lightbox-prev,
+        .lightbox-next {
+            position: fixed;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            z-index: 10001;
+            padding: 12px;
+            font-family: 'Space Mono', monospace;
+            transition: color 0.2s;
+        }
+        .lightbox-close:hover,
+        .lightbox-prev:hover,
+        .lightbox-next:hover {
+            color: var(--neon-green);
+        }
+        .lightbox-close {
+            top: 20px;
+            right: 24px;
+            font-size: 2.5rem;
+        }
+        .lightbox-prev {
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 3rem;
+        }
+        .lightbox-next {
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 3rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .masonry-grid { column-count: 3; }
+        }
+        @media (max-width: 768px) {
+            .masonry-grid { column-count: 2; }
+            .gallery-page { padding: 100px 16px 40px; }
+        }
+        @media (max-width: 480px) {
+            .masonry-grid { column-count: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Scanline overlay -->
+<div class="scanlines"></div>
+
+<!-- Navigation -->
+<nav id="nav">
+    <div class="nav-inner">
+        <a href="index.html" class="nav-logo">CL</a>
+        <div class="nav-links">
+            <a href="index.html#research">Research</a>
+            <a href="index.html#team">Team</a>
+            <a href="index.html#publications">Papers</a>
+            <a href="gallery.html" class="active">Photos</a>
+            <a href="index.html#funding">Funding</a>
+            <a href="index.html#news">News</a>
+        </div>
+        <button class="nav-toggle" aria-label="Menu">&#9776;</button>
+    </div>
+</nav>
+
+<main class="gallery-page">
+    <a href="index.html" class="gallery-back">&larr; Back to main</a>
+    <h2 class="section-title pixel-font">
+        <span class="title-icon">&#x1F4F7;</span> PHOTO GALLERY
+        <span class="blink">_</span>
+    </h2>
+    <p class="section-intro" style="text-align:center; margin-bottom: 40px;">Moments from the lab, conferences, and celebrations.</p>
+
+    <!-- 2025 -->
+    <div class="year-section">
+        <h3 class="year-header">// 2025</h3>
+        <div class="masonry-grid">
+            <div class="gallery-item" data-full="images/photos/2025/group_summer_acreage.jpeg" data-caption="">
+                <img src="images/photos/thumbs/2025/group_summer_acreage.jpg" alt="2025 photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/2025/IMG_5722.jpeg" data-caption="">
+                <img src="images/photos/thumbs/2025/IMG_5722.jpg" alt="2025 photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/2025/IMG_5754.jpeg" data-caption="">
+                <img src="images/photos/thumbs/2025/IMG_5754.jpg" alt="2025 photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/2025/IMG_5802.jpeg" data-caption="">
+                <img src="images/photos/thumbs/2025/IMG_5802.jpg" alt="2025 photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/2025/IMG_7871.jpeg" data-caption="">
+                <img src="images/photos/thumbs/2025/IMG_7871.jpg" alt="2025 photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/2025/4089652076054046184.jpeg" data-caption="">
+                <img src="images/photos/thumbs/2025/4089652076054046184.jpg" alt="2025 photo" loading="lazy">
+            </div>
+        </div>
+    </div>
+
+    <!-- 2024 -->
+    <div class="year-section">
+        <h3 class="year-header">// 2024</h3>
+        <div class="masonry-grid">
+            <div class="gallery-item" data-full="images/photos/2024/IMG-20240510-WA0007.jpg" data-caption="Giulia giving a talk at CSHL Biology of Genomes!">
+                <img src="images/photos/thumbs/2024/IMG-20240510-WA0007.jpg" alt="Giulia giving a talk at CSHL Biology of Genomes!" loading="lazy">
+                <div class="gallery-caption">Giulia giving a talk at CSHL Biology of Genomes!</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2024/IMG_5020.jpeg" data-caption="Celebrating Giulia's paper acceptance at Cell!">
+                <img src="images/photos/thumbs/2024/IMG_5020.jpg" alt="Celebrating Giulia's paper acceptance at Cell!" loading="lazy">
+                <div class="gallery-caption">Celebrating Giulia's paper acceptance at Cell!</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2024/IMG_4844.jpeg" data-caption="NY Lunch post-CSHL Transposable Elements 2024">
+                <img src="images/photos/thumbs/2024/IMG_4844.jpg" alt="NY Lunch post-CSHL Transposable Elements 2024" loading="lazy">
+                <div class="gallery-caption">NY Lunch post-CSHL Transposable Elements 2024</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2024/IMG_4838.jpeg" data-caption="Andrea at CSHL Transposable Elements 2024">
+                <img src="images/photos/thumbs/2024/IMG_4838.jpg" alt="Andrea at CSHL Transposable Elements 2024" loading="lazy">
+                <div class="gallery-caption">Andrea at CSHL Transposable Elements 2024</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2024/IMG_4836.jpeg" data-caption="Atma at CSHL Transposable Elements 2024">
+                <img src="images/photos/thumbs/2024/IMG_4836.jpg" alt="Atma at CSHL Transposable Elements 2024" loading="lazy">
+                <div class="gallery-caption">Atma at CSHL Transposable Elements 2024</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2024/IMG_3996.jpeg" data-caption="Tequila shots for Adam's farewell">
+                <img src="images/photos/thumbs/2024/IMG_3996.jpg" alt="Tequila shots for Adam's farewell" loading="lazy">
+                <div class="gallery-caption">Tequila shots for Adam's farewell</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2024/IMG_3129.jpeg" data-caption="Celebrating Atma's paper accepted at Science Advances, at Chautauqua dining hall!">
+                <img src="images/photos/thumbs/2024/IMG_3129.jpg" alt="Celebrating Atma's paper accepted at Science Advances, at Chautauqua dining hall!" loading="lazy">
+                <div class="gallery-caption">Celebrating Atma's paper accepted at Science Advances, at Chautauqua dining hall!</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2024/IMG_3047.jpeg" data-caption="Keala's cow jumping over the moon">
+                <img src="images/photos/thumbs/2024/IMG_3047.jpg" alt="Keala's cow jumping over the moon" loading="lazy">
+                <div class="gallery-caption">Keala's cow jumping over the moon</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2024/IMG_3045.jpeg" data-caption="Lily and Keala's farewell at STEM Ciders">
+                <img src="images/photos/thumbs/2024/IMG_3045.jpg" alt="Lily and Keala's farewell at STEM Ciders" loading="lazy">
+                <div class="gallery-caption">Lily and Keala's farewell at STEM Ciders</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2024/IMG_2770.jpeg" data-caption="Adam's PhD defense">
+                <img src="images/photos/thumbs/2024/IMG_2770.jpg" alt="Adam's PhD defense" loading="lazy">
+                <div class="gallery-caption">Adam's PhD defense</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2024/IMG_2168.jpeg" data-caption="Lily's PhD celebration">
+                <img src="images/photos/thumbs/2024/IMG_2168.jpg" alt="Lily's PhD celebration" loading="lazy">
+                <div class="gallery-caption">Lily's PhD celebration</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2024/IMG_2166.jpeg" data-caption="Lily's PhD defense — graduate student #2 from the lab!">
+                <img src="images/photos/thumbs/2024/IMG_2166.jpg" alt="Lily's PhD defense — graduate student #2 from the lab!" loading="lazy">
+                <div class="gallery-caption">Lily's PhD defense &mdash; graduate student #2 from the lab!</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2024/IMG_1202.jpeg" data-caption="Celebrating Giulia's K99 award!">
+                <img src="images/photos/thumbs/2024/IMG_1202.jpg" alt="Celebrating Giulia's K99 award!" loading="lazy">
+                <div class="gallery-caption">Celebrating Giulia's K99 award!</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2024/IMG_4864.jpeg" data-caption="">
+                <img src="images/photos/thumbs/2024/IMG_4864.jpg" alt="2024 photo" loading="lazy">
+            </div>
+        </div>
+    </div>
+
+    <!-- 2023 -->
+    <div class="year-section">
+        <h3 class="year-header">// 2023</h3>
+        <div class="masonry-grid">
+            <div class="gallery-item" data-full="images/photos/2023/53289934571_3b68476ae6_o.jpg" data-caption="Ed receiving Regeneron Young Investigator Award at Athens ICIS">
+                <img src="images/photos/thumbs/2023/53289934571_3b68476ae6_o.jpg" alt="Ed receiving Regeneron Young Investigator Award at Athens ICIS" loading="lazy">
+                <div class="gallery-caption">Ed receiving Regeneron Young Investigator Award at Athens ICIS</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2023/53290187348_8de440536e_o.jpg" data-caption="">
+                <img src="images/photos/thumbs/2023/53290187348_8de440536e_o.jpg" alt="2023 photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/2023/53290403850_13c1306edd_o.jpg" data-caption="">
+                <img src="images/photos/thumbs/2023/53290403850_13c1306edd_o.jpg" alt="2023 photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/2023/holly_minion.jpeg" data-caption="Holly loading a minION for MCDB Phage class">
+                <img src="images/photos/thumbs/2023/holly_minion.jpg" alt="Holly loading a minION for MCDB Phage class" loading="lazy">
+                <div class="gallery-caption">Holly loading a minION for MCDB Phage class</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2023/IMG_0217.jpeg" data-caption="ABC Holiday party 2023">
+                <img src="images/photos/thumbs/2023/IMG_0217.jpg" alt="ABC Holiday party 2023" loading="lazy">
+                <div class="gallery-caption">ABC Holiday party 2023</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2023/IMG_1006.jpeg" data-caption="Pizza party at Ed's">
+                <img src="images/photos/thumbs/2023/IMG_1006.jpg" alt="Pizza party at Ed's" loading="lazy">
+                <div class="gallery-caption">Pizza party at Ed's</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2023/IMG_1007.jpeg" data-caption="Pizza party at Ed's Summer 2023">
+                <img src="images/photos/thumbs/2023/IMG_1007.jpg" alt="Pizza party at Ed's Summer 2023" loading="lazy">
+                <div class="gallery-caption">Pizza party at Ed's Summer 2023</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2023/IMG_1009.jpeg" data-caption="Pizza party at Ed's Summer 2023">
+                <img src="images/photos/thumbs/2023/IMG_1009.jpg" alt="Pizza party at Ed's Summer 2023" loading="lazy">
+                <div class="gallery-caption">Pizza party at Ed's Summer 2023</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2023/IMG_1010.jpeg" data-caption="Pizza party at Ed's Summer 2023">
+                <img src="images/photos/thumbs/2023/IMG_1010.jpg" alt="Pizza party at Ed's Summer 2023" loading="lazy">
+                <div class="gallery-caption">Pizza party at Ed's Summer 2023</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2023/IMG_1219.jpeg" data-caption="Undergrad farewell Summer 2023">
+                <img src="images/photos/thumbs/2023/IMG_1219.jpg" alt="Undergrad farewell Summer 2023" loading="lazy">
+                <div class="gallery-caption">Undergrad farewell Summer 2023</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2023/IMG_1596.jpeg" data-caption="Catching up with Cedric at Keystone TEs in Vancouver!">
+                <img src="images/photos/thumbs/2023/IMG_1596.jpg" alt="Catching up with Cedric at Keystone TEs in Vancouver!" loading="lazy">
+                <div class="gallery-caption">Catching up with Cedric at Keystone TEs in Vancouver!</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2023/IMG_1683.jpeg" data-caption="Carmen's defense">
+                <img src="images/photos/thumbs/2023/IMG_1683.jpg" alt="Carmen's defense" loading="lazy">
+                <div class="gallery-caption">Carmen's defense</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2023/IMG_1827.jpeg" data-caption="Olivia at ICIS Athens">
+                <img src="images/photos/thumbs/2023/IMG_1827.jpg" alt="Olivia at ICIS Athens" loading="lazy">
+                <div class="gallery-caption">Olivia at ICIS Athens</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/2023/IMG_5054.jpeg" data-caption="">
+                <img src="images/photos/thumbs/2023/IMG_5054.jpg" alt="2023 photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/2023/IMG_5060.jpeg" data-caption="">
+                <img src="images/photos/thumbs/2023/IMG_5060.jpg" alt="2023 photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/2023/IMG_0216.jpeg" data-caption="">
+                <img src="images/photos/thumbs/2023/IMG_0216.jpg" alt="2023 photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/2023/IMG_0217 2.jpeg" data-caption="">
+                <img src="images/photos/thumbs/2023/IMG_0217 2.jpg" alt="2023 photo" loading="lazy">
+            </div>
+        </div>
+    </div>
+
+    <!-- Older -->
+    <div class="year-section">
+        <h3 class="year-header">// EARLIER</h3>
+        <div class="masonry-grid">
+            <div class="gallery-item" data-full="images/photos/labhike_june2023a.jpeg" data-caption="Lab hike June 2023">
+                <img src="images/photos/thumbs/labhike_june2023a.jpg" alt="Lab hike June 2023" loading="lazy">
+                <div class="gallery-caption">Lab hike June 2023</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/labhike_june2023b.jpeg" data-caption="Lab hike June 2023">
+                <img src="images/photos/thumbs/labhike_june2023b.jpg" alt="Lab hike June 2023" loading="lazy">
+                <div class="gallery-caption">Lab hike June 2023</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/lily_babyshower2023.jpg" data-caption="Lily's baby shower 2023">
+                <img src="images/photos/thumbs/lily_babyshower2023.jpg" alt="Lily's baby shower 2023" loading="lazy">
+                <div class="gallery-caption">Lily's baby shower 2023</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/adam_cshl.jpeg" data-caption="Adam at CSHL Innate Immunity 2023">
+                <img src="images/photos/thumbs/adam_cshl.jpg" alt="Adam at CSHL Innate Immunity 2023" loading="lazy">
+                <div class="gallery-caption">Adam at CSHL Innate Immunity 2023</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/andrea_cshl.jpeg" data-caption="Andrea at CSHL Innate Immunity">
+                <img src="images/photos/thumbs/andrea_cshl.jpg" alt="Andrea at CSHL Innate Immunity" loading="lazy">
+                <div class="gallery-caption">Andrea at CSHL Innate Immunity</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/carmen_cshl.jpeg" data-caption="Carmen at CSHL">
+                <img src="images/photos/thumbs/carmen_cshl.jpg" alt="Carmen at CSHL" loading="lazy">
+                <div class="gallery-caption">Carmen at CSHL</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/andrea_batid.jpeg" data-caption="Andrea at the Bat Infectious Disease conference at CSU">
+                <img src="images/photos/thumbs/andrea_batid.jpg" alt="Andrea at the Bat Infectious Disease conference at CSU" loading="lazy">
+                <div class="gallery-caption">Andrea at the Bat Infectious Disease conference at CSU</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/abc_skating.jpeg" data-caption="Arnoult-Brumbaugh-Chuong lab ice skating holiday party">
+                <img src="images/photos/thumbs/abc_skating.jpg" alt="Arnoult-Brumbaugh-Chuong lab ice skating holiday party" loading="lazy">
+                <div class="gallery-caption">Arnoult-Brumbaugh-Chuong lab ice skating holiday party</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/labhike.jpeg" data-caption="Lab hike retreat Grand Lake 2022">
+                <img src="images/photos/thumbs/labhike.jpg" alt="Lab hike retreat Grand Lake 2022" loading="lazy">
+                <div class="gallery-caption">Lab hike retreat Grand Lake 2022</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/IMG_8309.jpg" data-caption="Workshopping at lab retreat in Grand Lake, CO">
+                <img src="images/photos/thumbs/IMG_8309.jpg" alt="Workshopping at lab retreat in Grand Lake, CO" loading="lazy">
+                <div class="gallery-caption">Workshopping at lab retreat in Grand Lake, CO</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/IMG_8312.jpg" data-caption="Olivia leading Yoga at lab retreat in Grand Lake, CO">
+                <img src="images/photos/thumbs/IMG_8312.jpg" alt="Olivia leading Yoga at lab retreat in Grand Lake, CO" loading="lazy">
+                <div class="gallery-caption">Olivia leading Yoga at lab retreat in Grand Lake, CO</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/IMG_8324.jpg" data-caption="Lake Day at lab retreat in Grand Lake, CO">
+                <img src="images/photos/thumbs/IMG_8324.jpg" alt="Lake Day at lab retreat in Grand Lake, CO" loading="lazy">
+                <div class="gallery-caption">Lake Day at lab retreat in Grand Lake, CO</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/IMG_7245.jpg" data-caption="Lake day at lab retreat in Grand Lake, CO">
+                <img src="images/photos/thumbs/IMG_7245.jpg" alt="Lake day at lab retreat in Grand Lake, CO" loading="lazy">
+                <div class="gallery-caption">Lake day at lab retreat in Grand Lake, CO</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/IMG_7254.jpg" data-caption="">
+                <img src="images/photos/thumbs/IMG_7254.jpg" alt="Older photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/IMG_7280.jpg" data-caption="Games at lab retreat in Grand Lake, CO">
+                <img src="images/photos/thumbs/IMG_7280.jpg" alt="Games at lab retreat in Grand Lake, CO" loading="lazy">
+                <div class="gallery-caption">Games at lab retreat in Grand Lake, CO</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/IMG_7309.jpg" data-caption="RMNP hike at lab retreat in Grand Lake, CO">
+                <img src="images/photos/thumbs/IMG_7309.jpg" alt="RMNP hike at lab retreat in Grand Lake, CO" loading="lazy">
+                <div class="gallery-caption">RMNP hike at lab retreat in Grand Lake, CO</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/giulia_mobdna.jpeg" data-caption="Celebrating Bat paper acceptance at Boulder Baked">
+                <img src="images/photos/thumbs/giulia_mobdna.jpg" alt="Celebrating Bat paper acceptance at Boulder Baked" loading="lazy">
+                <div class="gallery-caption">Celebrating Bat paper acceptance at Boulder Baked</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/andrea_mobdna.jpeg" data-caption="Celebrating Bat paper acceptance at Boulder Baked">
+                <img src="images/photos/thumbs/andrea_mobdna.jpg" alt="Celebrating Bat paper acceptance at Boulder Baked" loading="lazy">
+                <div class="gallery-caption">Celebrating Bat paper acceptance at Boulder Baked</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/conorgiulia_bat.jpeg" data-caption="Celebrating Giulia/Conor/Andrea's paper submission on bat transcriptome">
+                <img src="images/photos/thumbs/conorgiulia_bat.jpg" alt="Celebrating Giulia/Conor/Andrea's paper submission on bat transcriptome" loading="lazy">
+                <div class="gallery-caption">Celebrating Giulia/Conor/Andrea's paper submission on bat transcriptome</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/conorfarewell.jpeg" data-caption="Saying farewell to Conor at Swaylos Tiki">
+                <img src="images/photos/thumbs/conorfarewell.jpg" alt="Saying farewell to Conor at Swaylos Tiki" loading="lazy">
+                <div class="gallery-caption">Saying farewell to Conor at Swaylos Tiki</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/bella_farewell_acreage.jpeg" data-caption="Farewell to Bella at Acreage">
+                <img src="images/photos/thumbs/bella_farewell_acreage.jpg" alt="Farewell to Bella at Acreage" loading="lazy">
+                <div class="gallery-caption">Farewell to Bella at Acreage</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/davefarewell.jpeg" data-caption="Bestowing Dave with presents at Avery">
+                <img src="images/photos/thumbs/davefarewell.jpg" alt="Bestowing Dave with presents at Avery" loading="lazy">
+                <div class="gallery-caption">Bestowing Dave with presents at Avery</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/conor_GR_acceptance.jpg" data-caption="Celebrating Conor's paper acceptance at T/aco">
+                <img src="images/photos/thumbs/conor_GR_acceptance.jpg" alt="Celebrating Conor's paper acceptance at T/aco" loading="lazy">
+                <div class="gallery-caption">Celebrating Conor's paper acceptance at T/aco</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/edgiuliaandrea_csu.jpeg" data-caption="Ed Giulia and Andrea picking up bat cells at CSU!">
+                <img src="images/photos/thumbs/edgiuliaandrea_csu.jpg" alt="Ed Giulia and Andrea picking up bat cells at CSU!" loading="lazy">
+                <div class="gallery-caption">Ed Giulia and Andrea picking up bat cells at CSU!</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/conor_submitting_sweetcow.png" data-caption="Celebrating submitting Conor's paper at Sweet Cow">
+                <img src="images/photos/thumbs/conor_submitting_sweetcow.jpg" alt="Celebrating submitting Conor's paper at Sweet Cow" loading="lazy">
+                <div class="gallery-caption">Celebrating submitting Conor's paper at Sweet Cow</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/bella_poster.jpeg" data-caption="Bella's Senior poster">
+                <img src="images/photos/thumbs/bella_poster.jpg" alt="Bella's Senior poster" loading="lazy">
+                <div class="gallery-caption">Bella's Senior poster</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/Dec2021_ABC_skating.jpeg" data-caption="ABC Ice Skating party 2021">
+                <img src="images/photos/thumbs/Dec2021_ABC_skating.jpg" alt="ABC Ice Skating party 2021" loading="lazy">
+                <div class="gallery-caption">ABC Ice Skating party 2021</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/Biofrontiers_Researchers5GA.JPG" data-caption="Lab photo 2021">
+                <img src="images/photos/thumbs/Biofrontiers_Researchers5GA.jpg" alt="Lab photo 2021" loading="lazy">
+                <div class="gallery-caption">Lab photo 2021</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/rebeccafarewell.jpeg" data-caption="Rebecca farewell at Upslope">
+                <img src="images/photos/thumbs/rebeccafarewell.jpg" alt="Rebecca farewell at Upslope" loading="lazy">
+                <div class="gallery-caption">Rebecca farewell at Upslope</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/housephoto.jpeg" data-caption="Ed's Backyard gathering 2021">
+                <img src="images/photos/thumbs/housephoto.jpg" alt="Ed's Backyard gathering 2021" loading="lazy">
+                <div class="gallery-caption">Ed's Backyard gathering 2021</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/First remote zoom Screen Shot 2020-03-18 at 1.44.11 PM.png" data-caption="First remote Zoom lab meeting 2020">
+                <img src="images/photos/thumbs/First remote zoom Screen Shot 2020-03-18 at 1.44.11 PM.jpg" alt="First remote Zoom lab meeting 2020" loading="lazy">
+                <div class="gallery-caption">First remote Zoom lab meeting 2020</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/group_chez_thuy_jan2020.jpg" data-caption="January 2020 last pre-pandemic lab outing">
+                <img src="images/photos/thumbs/group_chez_thuy_jan2020.jpg" alt="January 2020 last pre-pandemic lab outing" loading="lazy">
+                <div class="gallery-caption">January 2020 last pre-pandemic lab outing</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/lablunch_2018.jpg" data-caption="Lab doubling lunch at Fate Brewing Oct 2018">
+                <img src="images/photos/thumbs/lablunch_2018.jpg" alt="Lab doubling lunch at Fate Brewing Oct 2018" loading="lazy">
+                <div class="gallery-caption">Lab doubling lunch at Fate Brewing Oct 2018</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/labphoto_2018.jpg" data-caption="Lab photo Feb 2019">
+                <img src="images/photos/thumbs/labphoto_2018.jpg" alt="Lab photo Feb 2019" loading="lazy">
+                <div class="gallery-caption">Lab photo Feb 2019</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/RMVA.jpg" data-caption="Yuanyuan, Ed, and Conor at the Rocky Mountain Virology Club retreat Sept 2018">
+                <img src="images/photos/thumbs/RMVA.jpg" alt="Yuanyuan, Ed, and Conor at the Rocky Mountain Virology Club retreat Sept 2018" loading="lazy">
+                <div class="gallery-caption">Yuanyuan, Ed, and Conor at the Rocky Mountain Virology Club retreat Sept 2018</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/zimmer.jpg" data-caption="Lab outing to Denver Science museum and Carl Zimmer 2018">
+                <img src="images/photos/thumbs/zimmer.jpg" alt="Lab outing to Denver Science museum and Carl Zimmer 2018" loading="lazy">
+                <div class="gallery-caption">Lab outing to Denver Science museum and Carl Zimmer 2018</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/tiedie_2018.jpeg" data-caption="Tie Die Day at JSCBB 2018">
+                <img src="images/photos/thumbs/tiedie_2018.jpg" alt="Tie Die Day at JSCBB 2018" loading="lazy">
+                <div class="gallery-caption">Tie Die Day at JSCBB 2018</div>
+            </div>
+            <div class="gallery-item" data-full="images/photos/IMG_8758.jpeg" data-caption="">
+                <img src="images/photos/thumbs/IMG_8758.jpg" alt="Older photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/IMG_8760.jpeg" data-caption="">
+                <img src="images/photos/thumbs/IMG_8760.jpg" alt="Older photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/IMG_8764.jpeg" data-caption="">
+                <img src="images/photos/thumbs/IMG_8764.jpg" alt="Older photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/IMG_8788.jpeg" data-caption="">
+                <img src="images/photos/thumbs/IMG_8788.jpg" alt="Older photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/IMG_9487.jpeg" data-caption="">
+                <img src="images/photos/thumbs/IMG_9487.jpg" alt="Older photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/IMG_9488.jpeg" data-caption="">
+                <img src="images/photos/thumbs/IMG_9488.jpg" alt="Older photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/IMG_1006.jpeg" data-caption="">
+                <img src="images/photos/thumbs/IMG_1006.jpg" alt="Older photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/IMG_1007.jpeg" data-caption="">
+                <img src="images/photos/thumbs/IMG_1007.jpg" alt="Older photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/IMG_1009.jpeg" data-caption="">
+                <img src="images/photos/thumbs/IMG_1009.jpg" alt="Older photo" loading="lazy">
+            </div>
+            <div class="gallery-item" data-full="images/photos/IMG_1010.jpeg" data-caption="">
+                <img src="images/photos/thumbs/IMG_1010.jpg" alt="Older photo" loading="lazy">
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+    <button class="lightbox-close" aria-label="Close">&times;</button>
+    <button class="lightbox-prev" aria-label="Previous">&lsaquo;</button>
+    <button class="lightbox-next" aria-label="Next">&rsaquo;</button>
+    <div class="lightbox-img-wrap">
+        <img id="lightbox-img" src="" alt="">
+    </div>
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-inner">
+        <div class="footer-invader"></div>
+        <p class="pixel-font small">CHUONG LAB &copy; 2025 | CU BOULDER</p>
+        <p class="footer-sub">Transposable elements: the genome's original copy-paste.</p>
+    </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+(function() {
+    const items = Array.from(document.querySelectorAll('.gallery-item'));
+    const lightbox = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lightbox-img');
+    const lbCaption = document.getElementById('lightbox-caption');
+    let currentIndex = -1;
+
+    function openLightbox(index) {
+        currentIndex = index;
+        const item = items[index];
+        lbImg.src = item.dataset.full;
+        lbImg.alt = item.dataset.caption || 'Photo';
+        lbCaption.textContent = item.dataset.caption || '';
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        lightbox.classList.remove('active');
+        document.body.style.overflow = '';
+        lbImg.src = '';
+        currentIndex = -1;
+    }
+
+    function navigate(dir) {
+        if (currentIndex < 0) return;
+        currentIndex = (currentIndex + dir + items.length) % items.length;
+        const item = items[currentIndex];
+        lbImg.src = item.dataset.full;
+        lbImg.alt = item.dataset.caption || 'Photo';
+        lbCaption.textContent = item.dataset.caption || '';
+    }
+
+    items.forEach(function(item, i) {
+        item.addEventListener('click', function() { openLightbox(i); });
+    });
+
+    document.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+    document.querySelector('.lightbox-prev').addEventListener('click', function() { navigate(-1); });
+    document.querySelector('.lightbox-next').addEventListener('click', function() { navigate(1); });
+
+    lightbox.addEventListener('click', function(e) {
+        if (e.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (!lightbox.classList.contains('active')) return;
+        if (e.key === 'Escape') closeLightbox();
+        else if (e.key === 'ArrowLeft') navigate(-1);
+        else if (e.key === 'ArrowRight') navigate(1);
+    });
+})();
+</script>
+</body>
+</html>
