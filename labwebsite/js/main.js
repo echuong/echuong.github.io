@@ -282,20 +282,6 @@
     // --- Scrolling Genome Background Animation ---
     const genomeBg = document.getElementById('genome-bg');
     if (genomeBg) {
-        // Force z-index via JS (CSS may be cached by server)
-        genomeBg.style.zIndex = '1';
-        // Put all sections above canvas
-        document.querySelectorAll('.hero, section.section, section.section-alt, footer').forEach(el => {
-            el.style.position = 'relative';
-            el.style.zIndex = '2';
-            // Add semi-transparent bg for readability (canvas is behind)
-            if (el.id === 'team' || el.id === 'funding') {
-                el.style.background = 'rgba(15, 14, 23, 0.70)';
-            } else if (el.classList.contains('section') || el.classList.contains('section-alt')) {
-                el.style.background = 'rgba(15, 14, 23, 0.80)';
-            }
-        });
-
         const ctx = genomeBg.getContext('2d');
         let W, H;
         let chromosomes = [];
