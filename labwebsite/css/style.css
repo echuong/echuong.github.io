@@ -325,20 +325,20 @@ a:hover {
     padding: 80px 20px;
     max-width: 1100px;
     margin: 0 auto;
-    background: rgba(15, 14, 23, 0.55);
+    background: rgba(15, 14, 23, 0.80);
 }
 
 .section-alt {
     max-width: none;
-    background: rgba(15, 14, 23, 0.55);
+    background: rgba(15, 14, 23, 0.80);
 }
 
 #team.section-alt {
-    background: rgba(15, 14, 23, 0.45);
+    background: rgba(15, 14, 23, 0.70);
 }
 
 #funding.section-alt {
-    background: rgba(15, 14, 23, 0.45);
+    background: rgba(15, 14, 23, 0.70);
 }
 .section-alt > * {
     max-width: 1100px;
@@ -964,6 +964,7 @@ footer .pixel-font {
 }
 
 /* --- Genome Background Canvas --- */
+#genome-bg,
 .genome-bg {
     position: fixed;
     top: 0;
@@ -971,16 +972,15 @@ footer .pixel-font {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 10;  /* Canvas renders ABOVE content as an overlay */
-    pointer-events: none;
+    z-index: 1 !important;  /* Canvas BEHIND content (z-index 2), above body */
 }
 
-/* Content at normal z-index — canvas overlays on top */
+/* Content above canvas */
 #nav { z-index: 1000 !important; position: fixed; }
-.hero { position: relative; z-index: 1; }
-section.section { position: relative; z-index: 1; }
-section.section-alt { position: relative; z-index: 1; }
-footer { position: relative; z-index: 1; }
+.hero { position: relative; z-index: 2; }
+section.section { position: relative; z-index: 2; }
+section.section-alt { position: relative; z-index: 2; }
+footer { position: relative; z-index: 2; }
 
 /* --- Member Modal --- */
 .member-modal {
