@@ -266,10 +266,16 @@
         document.body.style.overflow = '';
     }
 
-    // Attach click handlers to team cards
+    // Attach click and keyboard handlers to team cards
     document.querySelectorAll('.team-card[data-member]').forEach(card => {
         card.addEventListener('click', () => {
             openModal(card.dataset.member);
+        });
+        card.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openModal(card.dataset.member);
+            }
         });
     });
 
@@ -283,18 +289,30 @@
     const genomeBg = document.getElementById('genome-bg');
     if (genomeBg) {
         const ctx = genomeBg.getContext('2d');
-        let W, H;
+        let W, H, scrollMax;
         let chromosomes = [];
         let invaders = [];
+        let jumpingCount = 0; // tracked incrementally instead of filter() per frame
+        let rafId = null;
 
         function resize() {
             W = window.innerWidth;
             H = window.innerHeight;
             genomeBg.width = W;
             genomeBg.height = H;
+            scrollMax = document.body.scrollHeight - H;
             generateChromosomes();
             generateInvaders();
         }
+
+        // Pause animation when tab is hidden
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+            } else {
+                if (!rafId) { rafId = requestAnimationFrame(drawFrame); }
+            }
+        });
 
         function generateChromosomes() {
             chromosomes = [];
@@ -357,9 +375,7 @@
         function drawFrame() {
             ctx.clearRect(0, 0, W, H);
 
-            const scrollMax = document.body.scrollHeight - H;
-            const rawProgress = Math.min(1, window.scrollY / Math.max(1, scrollMax));
-            const progress = rawProgress; // linear — lets landing animation play out naturally
+            const progress = Math.min(1, window.scrollY / Math.max(1, scrollMax));
 
             // Draw chromosomes — faint at top, strong as you scroll
             const chromoAlpha = 0.04 + progress * 0.20;
@@ -391,9 +407,6 @@
             const time = Date.now() / 1000;
             const now = Date.now();
 
-            // Count currently jumping invaders (limit to 3 at a time)
-            const jumpingCount = invaders.filter(i => i.isJumping).length;
-
             invaders.forEach((inv, idx) => {
                 const landStart = inv.landPhase;
                 const landEnd = landStart + 0.20; // each invader takes 20% of scroll to land
@@ -414,6 +427,7 @@
                     if (!inv.isJumping && jumpingCount < 2 && progress > 0.3 && now - inv.lastJumpTime > inv.nextJumpDelay) {
                         // Start a new jump!
                         inv.isJumping = true;
+                        jumpingCount++;
                         inv.jumpStart = now;
                         inv.jumpFromX = inv.currentX;
                         inv.jumpFromY = inv.currentY;
@@ -445,6 +459,7 @@
                         if (jt >= 1) {
                             // Landing complete
                             inv.isJumping = false;
+                            jumpingCount--;
                             inv.currentX = inv.jumpToX;
                             inv.currentY = inv.jumpToY;
                             inv.landX = inv.jumpToX;
@@ -474,14 +489,6 @@
                 ctx.fillRect(x, y, s, s);
                 ctx.fillRect(x - s, y + s, s, s);
                 ctx.fillRect(x + s, y + s, s, s);
-
-                // Glow when landed
-                if (ease >= 0.7 && !inv.isJumping) {
-                    ctx.shadowColor = inv.color;
-                    ctx.shadowBlur = 4;
-                    ctx.fillRect(x, y, s, s);
-                    ctx.shadowBlur = 0;
-                }
 
                 ctx.globalAlpha = 1;
             });
@@ -519,12 +526,15 @@
                 ctx.globalAlpha = 1;
             }
 
-            requestAnimationFrame(drawFrame);
+            rafId = requestAnimationFrame(drawFrame);
         }
 
-        window.addEventListener('resize', resize);
+        window.addEventListener('resize', () => {
+            resize();
+            scrollMax = document.body.scrollHeight - H;
+        });
         resize();
-        drawFrame();
+        rafId = requestAnimationFrame(drawFrame);
     }
 
 })();
