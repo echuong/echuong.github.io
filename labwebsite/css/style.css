@@ -325,19 +325,20 @@ a:hover {
     padding: 80px 20px;
     max-width: 1100px;
     margin: 0 auto;
+    background: rgba(15, 14, 23, 0.55);
 }
 
 .section-alt {
     max-width: none;
-    background: transparent;
+    background: rgba(15, 14, 23, 0.55);
 }
 
 #team.section-alt {
-    background: transparent;
+    background: rgba(15, 14, 23, 0.45);
 }
 
 #funding.section-alt {
-    background: transparent;
+    background: rgba(15, 14, 23, 0.45);
 }
 .section-alt > * {
     max-width: 1100px;

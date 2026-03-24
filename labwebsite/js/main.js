@@ -344,7 +344,7 @@
                     landPhase: Math.random() * 0.35, // range 0.0 to 0.35: land during hero→research scroll
                     // Copy-paste jump properties
                     lastJumpTime: Date.now() + Math.random() * 8000,
-                    nextJumpDelay: 4000 + Math.random() * 6000,
+                    nextJumpDelay: 5000 + Math.random() * 7000,
                     isJumping: false,
                     jumpStart: 0,
                     jumpDuration: 400 + Math.random() * 200,
@@ -411,7 +411,7 @@
                     alpha = 0.25 + ease * 0.45; // brighter: 25% floating → 70% landed
                 } else {
                     // Fully landed — copy-paste jump only after scrolling past hero (~30% progress)
-                    if (!inv.isJumping && jumpingCount < 3 && progress > 0.3 && now - inv.lastJumpTime > inv.nextJumpDelay) {
+                    if (!inv.isJumping && jumpingCount < 2 && progress > 0.3 && now - inv.lastJumpTime > inv.nextJumpDelay) {
                         // Start a new jump!
                         inv.isJumping = true;
                         inv.jumpStart = now;
@@ -450,7 +450,7 @@
                             inv.landX = inv.jumpToX;
                             inv.landY = inv.jumpToY;
                             inv.lastJumpTime = now;
-                            inv.nextJumpDelay = 4000 + Math.random() * 6000;
+                            inv.nextJumpDelay = 5000 + Math.random() * 7000;
 
                             // Burst effect at landing
                             bursts.push({
