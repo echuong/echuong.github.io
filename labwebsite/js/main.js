@@ -9,7 +9,7 @@ import { prepareWithSegments, layoutWithLines } from '@chenglou/pretext';
     'use strict';
 
     // --- Pretext-powered TE label system ---
-    const teLabels = ['LINE', 'SINE', 'ERV', 'Alu', 'L1', 'B2', 'MER41', 'LTR10', 'SVA', 'HERV-K'];
+    const teLabels = ['LTR10', 'MER41', 'LTR8', 'Alu', 'LINE1', 'LINE2', 'LTR18', 'SVA', 'HERV-K'];
     const labelFont = '10px "Press Start 2P"';
     // Pre-prepare all labels with pretext for efficient canvas rendering
     const preparedLabels = {};

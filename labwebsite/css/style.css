@@ -19,8 +19,8 @@
     --neon-yellow: #f5f749;
     --neon-green: #16c79a;
     --neon-purple: #a855f7;
-    --text-primary: #e0e0e0;
-    --text-muted: #8892b0;
+    --text-primary: #f0f0f0;
+    --text-muted: #a0a8c4;
     --text-bright: #ffffff;
     --pixel-border: #e94560;
     --glow-pink: 0 0 10px #e94560, 0 0 20px #e9456044;
@@ -41,7 +41,9 @@ body {
     color: var(--text-primary);
     line-height: 1.7;
     font-size: 15px;
+    font-weight: 500;
     overflow-x: hidden;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 a {
