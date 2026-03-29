@@ -968,11 +968,14 @@ footer .pixel-font {
     mix-blend-mode: screen; /* Adds light on dark — invaders glow through without obscuring text */
 }
 
-/* Content below the blended canvas */
+/* Layering: canvas is z-index 10 as an overlay.
+   Hero stays BELOW canvas (z-index 1) so invaders show over it.
+   All other sections go ABOVE canvas (z-index 11) so text is readable
+   but the animation peeks through via their translucent backgrounds. */
 .hero { position: relative; z-index: 1; }
-section.section { position: relative; z-index: 1; }
-section.section-alt { position: relative; z-index: 1; }
-footer { position: relative; z-index: 1; }
+section.section { position: relative; z-index: 11; }
+section.section-alt { position: relative; z-index: 11; }
+footer { position: relative; z-index: 11; }
 
 /* --- Member Modal --- */
 .member-modal {
