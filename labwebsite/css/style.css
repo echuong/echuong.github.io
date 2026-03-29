@@ -327,12 +327,12 @@ a:hover {
     padding: 80px 20px;
     max-width: 1100px;
     margin: 0 auto;
-    background: transparent;
+    background: rgba(15, 14, 23, 0.25);
 }
 
 .section-alt {
     max-width: none;
-    background: transparent;
+    background: rgba(15, 14, 23, 0.25);
 }
 
 .section-alt > * {
@@ -387,7 +387,7 @@ a:hover {
 }
 
 .research-card {
-    background: rgba(22, 33, 62, 0.95);
+    background: rgba(22, 33, 62, 0.80);
     border: 1px solid rgba(233, 69, 96, 0.2);
     padding: 28px;
     position: relative;
@@ -545,7 +545,7 @@ a:hover {
 }
 
 .team-card {
-    background: rgba(22, 33, 62, 0.96);
+    background: rgba(22, 33, 62, 0.80);
     border: 1px solid rgba(0, 212, 255, 0.15);
     padding: 24px;
     text-align: center;
@@ -661,7 +661,7 @@ a:hover {
     margin-top: 40px;
     padding: 24px;
     border: 1px solid rgba(255,255,255,0.05);
-    background: rgba(22, 33, 62, 0.95);
+    background: rgba(22, 33, 62, 0.80);
 }
 
 .alumni-list {
@@ -693,7 +693,7 @@ a:hover {
     display: flex;
     gap: 12px;
     padding: 18px 20px;
-    background: rgba(22, 33, 62, 0.96);
+    background: rgba(22, 33, 62, 0.80);
     border: 1px solid rgba(0, 212, 255, 0.15);
     border-radius: 4px;
     align-items: flex-start;
@@ -800,7 +800,7 @@ a:hover {
 }
 
 .funding-card {
-    background: rgba(22, 33, 62, 0.96);
+    background: rgba(22, 33, 62, 0.80);
     border: 1px solid rgba(255,255,255,0.05);
     padding: 14px 16px;
     text-align: center;
@@ -871,7 +871,7 @@ a:hover {
     display: flex;
     gap: 12px;
     align-items: flex-start;
-    background: rgba(22, 33, 62, 0.96);
+    background: rgba(22, 33, 62, 0.80);
     border: 1px solid rgba(0, 212, 255, 0.15);
     border-radius: 4px;
 }
@@ -891,7 +891,7 @@ a:hover {
 }
 
 .contact-info {
-    background: rgba(22, 33, 62, 0.96);
+    background: rgba(22, 33, 62, 0.80);
     border: 1px solid rgba(0, 212, 255, 0.15);
     border-radius: 4px;
     padding: 16px;
