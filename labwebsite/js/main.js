@@ -1,10 +1,26 @@
 /* ========================================
    CHUONG LAB — GENOME INVADERS
-   Main JavaScript
+   Main JavaScript (ES Module)
    ======================================== */
+
+import { prepareWithSegments, layoutWithLines } from '@chenglou/pretext';
 
 (function () {
     'use strict';
+
+    // --- Pretext-powered TE label system ---
+    const teLabels = ['LINE', 'SINE', 'ERV', 'Alu', 'L1', 'B2', 'MER41', 'LTR10', 'SVA', 'HERV-K'];
+    const labelFont = '10px "Press Start 2P"';
+    // Pre-prepare all labels with pretext for efficient canvas rendering
+    const preparedLabels = {};
+    try {
+        teLabels.forEach(label => {
+            preparedLabels[label] = prepareWithSegments(label, labelFont);
+        });
+    } catch (e) {
+        // Font may not be loaded yet; we'll use canvas fillText as fallback
+        console.log('Pretext label init deferred — font not yet loaded');
+    }
 
     // --- Member Bio Data ---
     const memberData = {
@@ -348,6 +364,7 @@
             const count = 75 + Math.floor(Math.random() * 30);
             for (let i = 0; i < count; i++) {
                 const spot = pickChromoSpot();
+                const teFamily = teLabels[Math.floor(Math.random() * teLabels.length)];
                 invaders.push({
                     startX: Math.random() * W,
                     startY: Math.random() * H,
@@ -360,6 +377,9 @@
                     floatPhase: Math.random() * Math.PI * 2,
                     floatSpeed: 0.5 + Math.random() * 1.5,
                     landPhase: Math.random() * 0.35, // range 0.0 to 0.35: land during hero→research scroll
+                    teFamily: teFamily,
+                    showLabel: i % 5 === 0, // only ~20% of invaders show labels to avoid clutter
+                    labelAlpha: 0,
                     // Copy-paste jump properties
                     lastJumpTime: Date.now() + Math.random() * 8000,
                     nextJumpDelay: 5000 + Math.random() * 7000,
@@ -467,10 +487,11 @@
                             inv.lastJumpTime = now;
                             inv.nextJumpDelay = 5000 + Math.random() * 7000;
 
-                            // Burst effect at landing
+                            // Burst effect at landing with TE label
                             bursts.push({
                                 x: inv.jumpToX, y: inv.jumpToY,
-                                color: inv.color, born: now, life: 500
+                                color: inv.color, born: now, life: 800,
+                                teFamily: inv.teFamily
                             });
                         }
                     } else {
@@ -489,6 +510,28 @@
                 ctx.fillRect(x, y, s, s);
                 ctx.fillRect(x - s, y + s, s, s);
                 ctx.fillRect(x + s, y + s, s, s);
+
+                // Draw TE family label (pretext-measured) at landed insertion sites
+                if (inv.showLabel && ease >= 0.9) {
+                    const labelAlpha = Math.min(0.5, (ease - 0.9) * 5) * alpha;
+                    if (labelAlpha > 0.02) {
+                        ctx.globalAlpha = labelAlpha;
+                        ctx.font = labelFont;
+                        ctx.fillStyle = inv.color;
+
+                        // Use pretext layout data if available for precise positioning
+                        const prepared = preparedLabels[inv.teFamily];
+                        if (prepared) {
+                            const { lines } = layoutWithLines(prepared, 200, 12);
+                            if (lines.length > 0) {
+                                ctx.fillText(lines[0].text, x + s * 2 + 3, y + s * 0.5);
+                            }
+                        } else {
+                            // Fallback: direct canvas fillText
+                            ctx.fillText(inv.teFamily, x + s * 2 + 3, y + s * 0.5);
+                        }
+                    }
+                }
 
                 ctx.globalAlpha = 1;
             });
@@ -510,7 +553,7 @@
                 ctx.globalAlpha = 1;
             }
 
-            // Draw burst effects (expanding ring at insertion site)
+            // Draw burst effects (expanding ring + TE label at insertion site)
             for (let i = bursts.length - 1; i >= 0; i--) {
                 const b = bursts[i];
                 const age = now - b.born;
@@ -523,6 +566,23 @@
                 ctx.beginPath();
                 ctx.arc(b.x, b.y, radius, 0, Math.PI * 2);
                 ctx.stroke();
+
+                // Flash TE family name at insertion site using pretext
+                if (b.teFamily && t < 0.7) {
+                    ctx.globalAlpha = (1 - t / 0.7) * 0.6;
+                    ctx.font = '8px "Press Start 2P"';
+                    ctx.fillStyle = b.color;
+                    const prepared = preparedLabels[b.teFamily];
+                    if (prepared) {
+                        const { lines } = layoutWithLines(prepared, 150, 10);
+                        if (lines.length > 0) {
+                            ctx.fillText(lines[0].text, b.x + radius + 2, b.y + 3);
+                        }
+                    } else {
+                        ctx.fillText(b.teFamily, b.x + radius + 2, b.y + 3);
+                    }
+                }
+
                 ctx.globalAlpha = 1;
             }
 
