@@ -3,7 +3,7 @@
    Main JavaScript (ES Module)
    ======================================== */
 
-import { prepareWithSegments, layoutWithLines, layoutNextLine } from '@chenglou/pretext';
+import { prepareWithSegments, layoutWithLines } from '@chenglou/pretext';
 
 (function () {
     'use strict';
@@ -20,87 +20,6 @@ import { prepareWithSegments, layoutWithLines, layoutNextLine } from '@chenglou/
     } catch (e) {
         // Font may not be loaded yet; we'll use canvas fillText as fallback
         console.log('Pretext label init deferred — font not yet loaded');
-    }
-
-    // --- TE color map for ticker highlighting ---
-    const teColorMap = {};
-    const teColors = ['#e94560', '#00d4ff', '#16c79a', '#f5f749', '#a855f7'];
-    teLabels.forEach((label, i) => { teColorMap[label] = teColors[i % teColors.length]; });
-
-    // --- Genome Sequence Ticker (pretext-powered) ---
-    // Generates a sequence string like "...ATCGATCG LTR10 ATCGATCG MER41..."
-    function generateTickerSequence() {
-        const bases = 'ACGT';
-        let seq = '';
-        const segments = []; // { start, end, isTE, teFamily }
-        for (let i = 0; i < 60; i++) {
-            // Random ACGT run (8-16 chars)
-            const runLen = 8 + Math.floor(Math.random() * 9);
-            const runStart = seq.length;
-            for (let j = 0; j < runLen; j++) seq += bases[Math.floor(Math.random() * 4)];
-            segments.push({ start: runStart, end: seq.length, isTE: false });
-            // Insert a TE name
-            const te = teLabels[Math.floor(Math.random() * teLabels.length)];
-            const teStart = seq.length;
-            seq += te;
-            segments.push({ start: teStart, end: seq.length, isTE: true, teFamily: te });
-        }
-        return { text: seq, segments };
-    }
-
-    // Ticker bands: each has its own prepared text, y-position ratio, speed
-    const tickerBands = [];
-    const tickerFont = '7px "Press Start 2P"';
-    try {
-        for (let b = 0; b < 3; b++) {
-            const { text, segments } = generateTickerSequence();
-            const prepared = prepareWithSegments(text, tickerFont);
-            // Compute cumulative x-positions from prepared widths
-            const widths = prepared.widths || [];
-            const cumX = new Float64Array(widths.length + 1);
-            for (let i = 0; i < widths.length; i++) cumX[i + 1] = cumX[i] + widths[i];
-            const totalWidth = cumX[cumX.length - 1] || 1;
-            tickerBands.push({
-                prepared, segments, cumX, totalWidth,
-                yRatio: 0.15 + b * 0.30, // spread across canvas height
-                speed: 12 + b * 8, // px/sec, different per band
-                text
-            });
-        }
-    } catch (e) {
-        console.log('Ticker init deferred:', e.message);
-    }
-
-    // --- DNA Flow Columns (pretext layoutNextLine) ---
-    function generateDNAString(length) {
-        const bases = 'ACGT';
-        let s = '';
-        for (let i = 0; i < length; i++) {
-            s += bases[Math.floor(Math.random() * 4)];
-            // Add spaces every 4-8 chars for word-break opportunities
-            if (Math.random() < 0.15) s += ' ';
-        }
-        return s;
-    }
-
-    const dnaColumns = [];
-    const dnaFont = '6px "Press Start 2P"';
-    const dnaLineHeight = 8;
-    try {
-        const colCount = 3;
-        for (let c = 0; c < colCount; c++) {
-            const text = generateDNAString(2000);
-            const prepared = prepareWithSegments(text, dnaFont);
-            dnaColumns.push({
-                prepared,
-                xRatio: 0.1 + c * 0.35, // spread columns across width
-                widthRatio: 0.22, // each column is ~22% of canvas width
-                speed: 6 + c * 3, // vertical scroll speed px/sec
-                color: c === 0 ? 'rgba(0, 212, 255, 0.04)' : c === 1 ? 'rgba(22, 199, 154, 0.035)' : 'rgba(168, 85, 247, 0.03)'
-            });
-        }
-    } catch (e) {
-        console.log('DNA flow init deferred:', e.message);
     }
 
     // --- Member Bio Data ---
@@ -477,120 +396,6 @@ import { prepareWithSegments, layoutWithLines, layoutNextLine } from '@chenglou/
             ctx.clearRect(0, 0, W, H);
 
             const progress = Math.min(1, window.scrollY / Math.max(1, scrollMax));
-            const time = Date.now() / 1000;
-
-            // --- Draw genome sequence ticker (behind everything) ---
-            if (tickerBands.length > 0) {
-                ctx.font = tickerFont;
-                ctx.textBaseline = 'top';
-                tickerBands.forEach(band => {
-                    const y = H * band.yRatio;
-                    const offset = (time * band.speed) % band.totalWidth;
-                    // Draw band twice for seamless loop
-                    for (let pass = 0; pass < 2; pass++) {
-                        const baseX = -offset + pass * band.totalWidth;
-                        // Skip if entirely offscreen
-                        if (baseX > W || baseX + band.totalWidth < 0) continue;
-                        band.segments.forEach(seg => {
-                            const segStartX = baseX + band.cumX[seg.start];
-                            const segEndX = baseX + band.cumX[seg.end];
-                            // Viewport culling
-                            if (segEndX < 0 || segStartX > W) return;
-                            if (seg.isTE) {
-                                ctx.fillStyle = teColorMap[seg.teFamily] || '#00d4ff';
-                                ctx.globalAlpha = 0.07;
-                            } else {
-                                ctx.fillStyle = '#a0a8c4';
-                                ctx.globalAlpha = 0.025;
-                            }
-                            // Draw character by character for proper positioning
-                            for (let ci = seg.start; ci < seg.end; ci++) {
-                                const cx = baseX + band.cumX[ci];
-                                if (cx > W) break;
-                                if (cx + (band.cumX[ci + 1] - band.cumX[ci]) < 0) continue;
-                                ctx.fillText(band.text[ci], cx, y);
-                            }
-                        });
-                    }
-                });
-                ctx.globalAlpha = 1;
-            }
-
-            // --- Draw DNA flowing around chromosomes (pretext layoutNextLine) ---
-            if (dnaColumns.length > 0) {
-                ctx.font = dnaFont;
-                ctx.textBaseline = 'top';
-                dnaColumns.forEach(col => {
-                    const colX = W * col.xRatio;
-                    const colWidth = W * col.widthRatio;
-                    const scrollOffset = (time * col.speed) % 600; // cycle through text
-                    ctx.fillStyle = col.color;
-                    ctx.globalAlpha = 1; // alpha is baked into the color string
-
-                    // Step through vertical positions
-                    let start = { segmentIndex: 0, graphemeIndex: 0 };
-                    // Offset the start position based on scroll for animation
-                    const skipLines = Math.floor(scrollOffset / dnaLineHeight);
-                    for (let skip = 0; skip < skipLines; skip++) {
-                        const skipped = layoutNextLine(col.prepared, start, colWidth);
-                        if (!skipped) { start = { segmentIndex: 0, graphemeIndex: 0 }; break; }
-                        start = skipped.end;
-                    }
-
-                    for (let row = 0; row < Math.ceil(H / dnaLineHeight) + 2; row++) {
-                        const yPos = row * dnaLineHeight - (scrollOffset % dnaLineHeight);
-                        if (yPos > H) break;
-
-                        // Compute available width by subtracting chromosome overlap
-                        let availWidth = colWidth;
-                        chromosomes.forEach(chr => {
-                            const chrLeft = chr.x - chr.w / 2;
-                            const chrRight = chr.x + chr.w / 2;
-                            const chrTop = chr.y;
-                            const chrBot = chr.y + chr.h;
-                            if (yPos >= chrTop && yPos <= chrBot) {
-                                // Check horizontal overlap with this column
-                                const overlapLeft = Math.max(colX, chrLeft);
-                                const overlapRight = Math.min(colX + colWidth, chrRight);
-                                if (overlapRight > overlapLeft) {
-                                    availWidth -= (overlapRight - overlapLeft);
-                                }
-                            }
-                        });
-
-                        if (availWidth < 10) {
-                            // Too narrow — skip this line but still advance text
-                            const skipped = layoutNextLine(col.prepared, start, colWidth);
-                            if (!skipped) { start = { segmentIndex: 0, graphemeIndex: 0 }; continue; }
-                            start = skipped.end;
-                            continue;
-                        }
-
-                        const line = layoutNextLine(col.prepared, start, availWidth);
-                        if (!line) {
-                            // Wrap back to beginning of text
-                            start = { segmentIndex: 0, graphemeIndex: 0 };
-                            continue;
-                        }
-
-                        // Shift text right when chromosome narrows left side of column
-                        let drawX = colX;
-                        chromosomes.forEach(chr => {
-                            const chrLeft = chr.x - chr.w / 2;
-                            const chrRight = chr.x + chr.w / 2;
-                            if (yPos >= chr.y && yPos <= chr.y + chr.h) {
-                                if (chrLeft <= colX && chrRight > colX) {
-                                    drawX = Math.max(drawX, chrRight + 2);
-                                }
-                            }
-                        });
-
-                        ctx.fillText(line.text, drawX, yPos);
-                        start = line.end;
-                    }
-                });
-                ctx.globalAlpha = 1;
-            }
 
             // Draw chromosomes — faint at top, strong as you scroll
             const chromoAlpha = 0.04 + progress * 0.20;
@@ -619,6 +424,7 @@ import { prepareWithSegments, layoutWithLines, layoutNextLine } from '@chenglou/
             });
 
             // Draw invaders — interpolate from floating to landed, then copy-paste jump
+            const time = Date.now() / 1000;
             const now = Date.now();
 
             invaders.forEach((inv, idx) => {
@@ -764,11 +570,11 @@ import { prepareWithSegments, layoutWithLines, layoutNextLine } from '@chenglou/
                 // Flash TE family name at insertion site using pretext
                 if (b.teFamily && t < 0.7) {
                     ctx.globalAlpha = (1 - t / 0.7) * 0.6;
-                    ctx.font = labelFont; // use same 10px font as prepared labels
+                    ctx.font = '8px "Press Start 2P"';
                     ctx.fillStyle = b.color;
                     const prepared = preparedLabels[b.teFamily];
                     if (prepared) {
-                        const { lines } = layoutWithLines(prepared, 200, 12);
+                        const { lines } = layoutWithLines(prepared, 150, 10);
                         if (lines.length > 0) {
                             ctx.fillText(lines[0].text, b.x + radius + 2, b.y + 3);
                         }
