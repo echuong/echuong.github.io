@@ -570,11 +570,11 @@ import { prepareWithSegments, layoutWithLines } from '@chenglou/pretext';
                 // Flash TE family name at insertion site using pretext
                 if (b.teFamily && t < 0.7) {
                     ctx.globalAlpha = (1 - t / 0.7) * 0.6;
-                    ctx.font = '8px "Press Start 2P"';
+                    ctx.font = labelFont; // match the 10px font labels were prepared with
                     ctx.fillStyle = b.color;
                     const prepared = preparedLabels[b.teFamily];
                     if (prepared) {
-                        const { lines } = layoutWithLines(prepared, 150, 10);
+                        const { lines } = layoutWithLines(prepared, 200, 12);
                         if (lines.length > 0) {
                             ctx.fillText(lines[0].text, b.x + radius + 2, b.y + 3);
                         }
