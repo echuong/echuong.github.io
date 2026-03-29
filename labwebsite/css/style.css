@@ -81,7 +81,7 @@ a:hover {
     left: 0;
     right: 0;
     z-index: 1000;
-    background: rgba(15, 14, 23, 0.95);
+    background: rgba(15, 14, 23, 0.97);
     border-bottom: 2px solid var(--neon-pink);
     backdrop-filter: blur(10px);
 }
@@ -387,7 +387,7 @@ a:hover {
 }
 
 .research-card {
-    background: rgba(22, 33, 62, 0.8);
+    background: rgba(22, 33, 62, 0.95);
     border: 1px solid rgba(233, 69, 96, 0.2);
     padding: 28px;
     position: relative;
@@ -545,7 +545,7 @@ a:hover {
 }
 
 .team-card {
-    background: rgba(22, 33, 62, 0.88);
+    background: rgba(22, 33, 62, 0.96);
     border: 1px solid rgba(0, 212, 255, 0.15);
     padding: 24px;
     text-align: center;
@@ -661,7 +661,7 @@ a:hover {
     margin-top: 40px;
     padding: 24px;
     border: 1px solid rgba(255,255,255,0.05);
-    background: rgba(22, 33, 62, 0.82);
+    background: rgba(22, 33, 62, 0.95);
 }
 
 .alumni-list {
@@ -684,7 +684,7 @@ a:hover {
 /* --- Publications --- */
 .pub-list {
     max-width: 800px;
-    background: rgba(15, 14, 23, 0.95);
+    background: rgba(15, 14, 23, 0.97);
     padding: 20px 24px;
     border-radius: 4px;
 }
@@ -694,7 +694,7 @@ a:hover {
     gap: 12px;
     padding: 14px 12px;
     border-bottom: 1px solid rgba(255,255,255,0.04);
-    background: rgba(15, 14, 23, 0.7);
+    background: rgba(15, 14, 23, 0.92);
     align-items: flex-start;
 }
 .pub-item:last-child {
@@ -799,7 +799,7 @@ a:hover {
 }
 
 .funding-card {
-    background: rgba(22, 33, 62, 0.91);
+    background: rgba(22, 33, 62, 0.96);
     border: 1px solid rgba(255,255,255,0.05);
     padding: 14px 16px;
     text-align: center;
@@ -856,7 +856,7 @@ a:hover {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 48px;
-    background: rgba(15, 14, 23, 0.95);
+    background: rgba(15, 14, 23, 0.97);
     padding: 24px;
     border-radius: 4px;
 }
@@ -873,7 +873,7 @@ a:hover {
     display: flex;
     gap: 12px;
     align-items: flex-start;
-    background: rgba(15, 14, 23, 0.7);
+    background: rgba(15, 14, 23, 0.92);
 }
 
 .news-date {
@@ -891,7 +891,7 @@ a:hover {
 }
 
 .contact-info {
-    background: rgba(15, 14, 23, 0.7);
+    background: rgba(15, 14, 23, 0.92);
     padding: 16px;
 }
 .contact-info p {
