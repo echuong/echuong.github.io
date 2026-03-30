@@ -3,24 +3,11 @@
    Main JavaScript (ES Module)
    ======================================== */
 
-import { prepareWithSegments, layoutWithLines } from '@chenglou/pretext';
-
 (function () {
     'use strict';
 
-    // --- Pretext-powered TE label system ---
     const teLabels = ['LTR10', 'MER41', 'LTR8', 'Alu', 'LINE1', 'LINE2', 'LTR18', 'SVA', 'HERV-K'];
     const labelFont = '10px "Press Start 2P"';
-    // Pre-prepare all labels with pretext for efficient canvas rendering
-    const preparedLabels = {};
-    try {
-        teLabels.forEach(label => {
-            preparedLabels[label] = prepareWithSegments(label, labelFont);
-        });
-    } catch (e) {
-        // Font may not be loaded yet; we'll use canvas fillText as fallback
-        console.log('Pretext label init deferred — font not yet loaded');
-    }
 
     // --- Member Bio Data ---
     const memberData = {
@@ -511,25 +498,14 @@ import { prepareWithSegments, layoutWithLines } from '@chenglou/pretext';
                 ctx.fillRect(x - s, y + s, s, s);
                 ctx.fillRect(x + s, y + s, s, s);
 
-                // Draw TE family label (pretext-measured) at landed insertion sites
+                // Draw TE family label at landed insertion sites
                 if (inv.showLabel && ease >= 0.9) {
                     const labelAlpha = Math.min(0.5, (ease - 0.9) * 5) * alpha;
                     if (labelAlpha > 0.02) {
                         ctx.globalAlpha = labelAlpha;
                         ctx.font = labelFont;
                         ctx.fillStyle = inv.color;
-
-                        // Use pretext layout data if available for precise positioning
-                        const prepared = preparedLabels[inv.teFamily];
-                        if (prepared) {
-                            const { lines } = layoutWithLines(prepared, 200, 12);
-                            if (lines.length > 0) {
-                                ctx.fillText(lines[0].text, x + s * 2 + 3, y + s * 0.5);
-                            }
-                        } else {
-                            // Fallback: direct canvas fillText
-                            ctx.fillText(inv.teFamily, x + s * 2 + 3, y + s * 0.5);
-                        }
+                        ctx.fillText(inv.teFamily, x + s * 2 + 3, y + s * 0.5);
                     }
                 }
 
@@ -567,20 +543,12 @@ import { prepareWithSegments, layoutWithLines } from '@chenglou/pretext';
                 ctx.arc(b.x, b.y, radius, 0, Math.PI * 2);
                 ctx.stroke();
 
-                // Flash TE family name at insertion site using pretext
+                // Flash TE family name at insertion site
                 if (b.teFamily && t < 0.7) {
                     ctx.globalAlpha = (1 - t / 0.7) * 0.6;
-                    ctx.font = labelFont; // match the 10px font labels were prepared with
+                    ctx.font = labelFont;
                     ctx.fillStyle = b.color;
-                    const prepared = preparedLabels[b.teFamily];
-                    if (prepared) {
-                        const { lines } = layoutWithLines(prepared, 200, 12);
-                        if (lines.length > 0) {
-                            ctx.fillText(lines[0].text, b.x + radius + 2, b.y + 3);
-                        }
-                    } else {
-                        ctx.fillText(b.teFamily, b.x + radius + 2, b.y + 3);
-                    }
+                    ctx.fillText(b.teFamily, b.x + radius + 2, b.y + 3);
                 }
 
                 ctx.globalAlpha = 1;
