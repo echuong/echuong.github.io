@@ -101,6 +101,15 @@
             email: 'carolina.valderramahincapie@colorado.edu',
             bio: 'Carolina was born in Bogota, Colombia, where she grew up and lived until she moved to the US to pursue her interests in becoming a researcher. She completed her Bachelor of Science in Biology at the University of New Mexico, Albuquerque, where she was studying insect-microbe interactions in agricultural pests. She is currently a PhD student in the MCDB program at CU, co-advised between the Chuong lab and the Kasinath lab. Her project focuses on understanding how chromatin remodeler proteins interact at the molecular level, and how disruptions in their function can affect normal cellular processes, contribute to disease, and influence the activity of transposable elements. She uses a combination of biochemical, genomic and computational approaches. Outside the lab, Carolina enjoys going on hikes, solving sudoku puzzles and cooking.'
         },
+        'nicholas-patty': {
+            name: 'Nicholas Patty',
+            pronouns: 'he/his',
+            role: 'Graduate Student • IQ Bio/MCDB',
+            details: 'MS Bioengineering, U. Pennsylvania • BA Biological Sciences, Vanderbilt',
+            photo: 'images/headshots/nicholas_patty.jpg',
+            email: 'nicholas.patty@colorado.edu',
+            bio: 'Nick was born and raised in Baton Rouge, LA and received his BA in Biological Sciences and Medicine, Health, and Society from Vanderbilt University, with a minor in Scientific Computing. After college, he spent three years in healthcare leveraged finance at MidCap Financial in the Washington, DC area before pivoting back to research. He earned his MS in Bioengineering from the University of Pennsylvania, where he worked on gene therapy for ALS in the Amado Lab at Children’s Hospital of Philadelphia and on TDP-43-regulated expression platforms at Biogen. He joined the Chuong lab in the summer of 2026 as a PhD student in the IQ Biology program and Molecular, Cellular, and Developmental Biology Department. His project in the lab focuses on understanding how transposable elements contribute to gene dysregulation in neurodegenerative disease using a combination of genomic and computational approaches. Outside the lab, Nick enjoys biking, hiking, skiing, and spending time with his partner Emelia and their cat Figgy.'
+        },
         'ashley-agyepong': {
             name: 'Ashley Agyepong',
             pronouns: '',
