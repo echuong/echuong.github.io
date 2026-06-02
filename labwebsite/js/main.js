@@ -357,7 +357,8 @@
             ghosts = [];
             bursts = [];
             const colors = ['#e94560', '#00d4ff', '#16c79a', '#f5f749', '#a855f7'];
-            const count = 75 + Math.floor(Math.random() * 30);
+            // Reduced from 75–105 → 25–35 to tone down distraction past the landing page
+            const count = 25 + Math.floor(Math.random() * 10);
             for (let i = 0; i < count; i++) {
                 const spot = pickChromoSpot();
                 const teFamily = teLabels[Math.floor(Math.random() * teLabels.length)];
@@ -376,9 +377,9 @@
                     teFamily: teFamily,
                     showLabel: i % 5 === 0, // only ~20% of invaders show labels to avoid clutter
                     labelAlpha: 0,
-                    // Copy-paste jump properties
-                    lastJumpTime: Date.now() + Math.random() * 8000,
-                    nextJumpDelay: 5000 + Math.random() * 7000,
+                    // Copy-paste jump properties — 3x longer delays so motion is rare while reading
+                    lastJumpTime: Date.now() + Math.random() * 20000,
+                    nextJumpDelay: 18000 + Math.random() * 18000,
                     isJumping: false,
                     jumpStart: 0,
                     jumpDuration: 400 + Math.random() * 200,
@@ -440,7 +441,8 @@
                     alpha = 0.25 + ease * 0.45; // brighter: 25% floating → 70% landed
                 } else {
                     // Fully landed — copy-paste jump only after scrolling past hero (~30% progress)
-                    if (!inv.isJumping && jumpingCount < 2 && progress > 0.3 && now - inv.lastJumpTime > inv.nextJumpDelay) {
+                    // Max 1 simultaneous jump (was 2) to keep motion minimal while reading
+                    if (!inv.isJumping && jumpingCount < 1 && progress > 0.3 && now - inv.lastJumpTime > inv.nextJumpDelay) {
                         // Start a new jump!
                         inv.isJumping = true;
                         jumpingCount++;
@@ -470,7 +472,7 @@
                         // Arc upward in the middle
                         y -= Math.sin(jt * Math.PI) * 40;
 
-                        alpha = 0.6 + Math.sin(jt * Math.PI) * 0.35; // pulse brighter during jump
+                        alpha = 0.4 + Math.sin(jt * Math.PI) * 0.15; // subtler pulse during jump
 
                         if (jt >= 1) {
                             // Landing complete
@@ -481,7 +483,7 @@
                             inv.landX = inv.jumpToX;
                             inv.landY = inv.jumpToY;
                             inv.lastJumpTime = now;
-                            inv.nextJumpDelay = 5000 + Math.random() * 7000;
+                            inv.nextJumpDelay = 18000 + Math.random() * 18000;
 
                             // Burst effect at landing with TE label
                             bursts.push({
@@ -493,7 +495,7 @@
                     } else {
                         x = inv.currentX;
                         y = inv.currentY;
-                        alpha = 0.65;
+                        alpha = 0.4; // calmer steady-state for landed invaders (was 0.65)
                     }
                 }
 
@@ -538,23 +540,23 @@
                 ctx.globalAlpha = 1;
             }
 
-            // Draw burst effects (expanding ring + TE label at insertion site)
+            // Draw burst effects (expanding ring + TE label at insertion site) — toned down ~60%
             for (let i = bursts.length - 1; i >= 0; i--) {
                 const b = bursts[i];
                 const age = now - b.born;
                 if (age > b.life) { bursts.splice(i, 1); continue; }
                 const t = age / b.life;
                 const radius = 3 + t * 18;
-                ctx.globalAlpha = (1 - t) * 0.4;
+                ctx.globalAlpha = (1 - t) * 0.15; // was 0.4
                 ctx.strokeStyle = b.color;
                 ctx.lineWidth = 1.5 * (1 - t);
                 ctx.beginPath();
                 ctx.arc(b.x, b.y, radius, 0, Math.PI * 2);
                 ctx.stroke();
 
-                // Flash TE family name at insertion site
+                // Flash TE family name at insertion site — much subtler now
                 if (b.teFamily && t < 0.7) {
-                    ctx.globalAlpha = (1 - t / 0.7) * 0.6;
+                    ctx.globalAlpha = (1 - t / 0.7) * 0.22; // was 0.6
                     ctx.font = labelFont;
                     ctx.fillStyle = b.color;
                     ctx.fillText(b.teFamily, b.x + radius + 2, b.y + 3);
