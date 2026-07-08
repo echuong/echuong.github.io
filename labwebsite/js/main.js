@@ -6,6 +6,9 @@
 (function () {
     'use strict';
 
+    // Respect users who prefer reduced motion — skip the decorative animations.
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     const teLabels = ['LTR10', 'MER41', 'LTR8', 'Alu', 'LINE1', 'LINE2', 'LTR18', 'SVA', 'HERV-K'];
     const labelFont = '10px "Press Start 2P"';
 
@@ -126,12 +129,15 @@
     const navLinks = document.querySelector('.nav-links');
 
     if (navToggle) {
+        navToggle.setAttribute('aria-expanded', 'false');
         navToggle.addEventListener('click', () => {
-            navLinks.classList.toggle('open');
+            const open = navLinks.classList.toggle('open');
+            navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
         });
         navLinks.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
                 navLinks.classList.remove('open');
+                navToggle.setAttribute('aria-expanded', 'false');
             });
         });
     }
@@ -160,7 +166,7 @@
 
     // --- Space Invader Sprites in Hero ---
     const field = document.getElementById('invaders-field');
-    if (field) {
+    if (field && !reduceMotion) {
         createInvaders(field);
     }
 
@@ -224,9 +230,13 @@
     const modalOverlay = modal ? modal.querySelector('.modal-overlay') : null;
     const modalClose = modal ? modal.querySelector('.modal-close') : null;
 
+    let modalOpener = null;
+
     function openModal(memberId) {
         const data = memberData[memberId];
         if (!data || !modal) return;
+
+        modalOpener = document.activeElement;
 
         document.getElementById('modal-photo').src = data.photo;
         document.getElementById('modal-photo').alt = data.name;
@@ -269,6 +279,8 @@
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
+        // Defer focus until the modal is visible (visibility flips on .active)
+        if (modalClose) requestAnimationFrame(() => modalClose.focus());
     }
 
     function closeModal() {
@@ -276,6 +288,11 @@
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
+        // Return focus to the card that opened the modal
+        if (modalOpener && typeof modalOpener.focus === 'function') {
+            modalOpener.focus();
+            modalOpener = null;
+        }
     }
 
     // Attach click and keyboard handlers to team cards
@@ -319,6 +336,7 @@
 
         // Pause animation when tab is hidden
         document.addEventListener('visibilitychange', () => {
+            if (reduceMotion) return;
             if (document.hidden) {
                 if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
             } else {
@@ -565,15 +583,23 @@
                 ctx.globalAlpha = 1;
             }
 
-            rafId = requestAnimationFrame(drawFrame);
+            if (!reduceMotion) rafId = requestAnimationFrame(drawFrame);
         }
 
         window.addEventListener('resize', () => {
             resize();
             scrollMax = document.body.scrollHeight - H;
+            if (reduceMotion) drawFrame();
         });
         resize();
-        rafId = requestAnimationFrame(drawFrame);
+        if (reduceMotion) {
+            // Static render only — redraw on scroll so the parallax stays in sync,
+            // but never run an autonomous animation loop.
+            drawFrame();
+            window.addEventListener('scroll', drawFrame, { passive: true });
+        } else {
+            rafId = requestAnimationFrame(drawFrame);
+        }
     }
 
 })();
